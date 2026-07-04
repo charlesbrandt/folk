@@ -1,0 +1,11 @@
+[project]
+name = "folk"
+version = "0.1.0"
+description = "remember the people you know"
+requires-python = ">=3.10"
+
+[project.scripts]
+folk = "folk.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
