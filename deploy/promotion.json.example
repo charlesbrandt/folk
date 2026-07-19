@@ -1,0 +1,19 @@
+{
+  "model": "gemma4:31b",
+  "ollama_url": "http://192.168.1.50:11434/v1/chat/completions",
+  "cap_per_run": 10,
+  "quiet_seconds": 3600,
+  "sources": {
+    "hermes": {
+      "profiles": {
+        "hermes-main": {
+          "sessions_dir": "~/agent/sessions",
+          "user_slug": "person:sam",
+          "agent_slug": "agent:hermes-main",
+          "collection": "personal",
+          "counterparty": []
+        }
+      }
+    }
+  }
+}

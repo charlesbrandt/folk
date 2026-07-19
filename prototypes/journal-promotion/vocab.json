@@ -1,0 +1,20 @@
+{
+  "slug_rules": "lowercase ascii, hyphen-separated, type prefix required (e.g. topic:surfacing-art)",
+  "types": ["person", "agent", "conv", "msg", "platform", "tag", "topic", "project", "value", "work", "moment", "media", "place", "event"],
+  "predicates": {
+    "participated_in": "subject took part in a conversation or event",
+    "uttered": "subject said the message pointed to (journal-only, never indexed)",
+    "opened_on": "conversation happened on a platform",
+    "tagged": "subject carries a tag",
+    "associated": "generic association between two entities",
+    "interested_in": "subject has an ongoing interest in a topic",
+    "prioritizes": "subject currently ranks this project or topic first (time-scoped; use when)",
+    "worked_through": "subject processed or studied a body of material",
+    "worked_on": "subject built or contributed to a project",
+    "values": "subject holds this as a guiding value (identity-level: level=bedrock)",
+    "believes": "subject holds this statement or axiom as true (identity-level: level=bedrock)",
+    "defining_moment": "an identity-shaping experience of the subject (identity-level: level=bedrock)",
+    "motivated_by": "an underlying driver inferred for the subject",
+    "assessed_most_meaningful": "an agent's judgment ranking an artifact's significance"
+  }
+}

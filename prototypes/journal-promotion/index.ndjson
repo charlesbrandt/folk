@@ -1,0 +1,15 @@
+{"note": "", "o": "conv:20260601_025800_7f3ac9e2", "p": "participated_in", "s": "agent:hermes-main", "src": "conv:20260601_025800_7f3ac9e2", "tier": "observed"}
+{"note": "", "o": "conv:20260601_025800_7f3ac9e2", "p": "participated_in", "s": "person:mara", "src": "conv:20260601_025800_7f3ac9e2", "tier": "observed"}
+{"note": "'I just worked through those materials back in December 2025' — sense-making about her current position", "o": "work:parish-archive", "p": "worked_through", "s": "person:mara", "src": "msg:20260601_025800_7f3ac9e2#32", "tier": "stated", "when": "2025-12"}
+{"note": "'I'm still interested in collecting local history stories' — asked the agent to keep watching for them", "o": "topic:collecting-local-history-stories", "p": "interested_in", "s": "person:mara", "src": "msg:20260601_025800_7f3ac9e2#32", "tier": "stated"}
+{"note": "'That should move to the top of the priority list, including troubleshooting any issues that crop up' — re garden-tracker", "o": "project:garden-tracker", "p": "prioritizes", "s": "person:mara", "src": "msg:20260601_025800_7f3ac9e2#1", "tier": "stated", "when": "2026-06-01"}
+{"note": "agent's judgment across the meaning-making corpus; challenged by Mara for recency bias, defended on content grounds", "o": "media:parish-oral-history-03", "p": "assessed_most_meaningful", "s": "agent:hermes-main", "src": "msg:20260601_025800_7f3ac9e2#19", "tier": "interpreted"}
+{"note": "meaning-unit cluster from synthesis (Self-Reliance, Rootedness, Hands-On Craft)", "o": "value:self-reliance", "p": "values", "s": "person:mara", "src": "msg:20260601_025800_7f3ac9e2#19", "tier": "candidate"}
+{"note": "meaning-unit cluster from synthesis", "o": "value:hands-on-craft", "p": "values", "s": "person:mara", "src": "msg:20260601_025800_7f3ac9e2#19", "tier": "candidate"}
+{"note": "meaning-unit cluster from synthesis", "o": "value:rootedness", "p": "values", "s": "person:mara", "src": "msg:20260601_025800_7f3ac9e2#19", "tier": "candidate"}
+{"note": "model=gemma4:31b", "o": "platform:telegram", "p": "opened_on", "s": "conv:20260601_025800_7f3ac9e2", "src": "conv:20260601_025800_7f3ac9e2", "tier": "observed"}
+{"note": "parish/oral-history-03.md: transition to analog tinkering via the radio workshop, late 70s/early 80s — the workshop as refuge", "o": "moment:radio-workshop-refuge", "p": "defining_moment", "s": "person:mara", "src": "msg:20260601_025800_7f3ac9e2#19", "tier": "candidate"}
+{"o": "person:hermes", "p": "agent", "s": "person:mara", "src": "mara.md", "tier": "human"}
+{"o": "tag:local-first", "p": "tagged", "s": "person:mara", "src": "mara.md", "tier": "human"}
+{"o": "tag:musician", "p": "tagged", "s": "person:mara", "src": "mara.md", "tier": "human"}
+{"o": "tag:writer", "p": "tagged", "s": "person:mara", "src": "mara.md", "tier": "human"}

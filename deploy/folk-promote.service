@@ -1,0 +1,12 @@
+[Unit]
+Description=folk session-end promotion job (extract/promote/lint/append or quarantine)
+# Runs low-priority so it never competes with a live Hermes conversation for
+# the GPU (session-promotion-job.md "Never blocks Hermes"); Ollama itself
+# serializes requests, this just keeps the job from hogging CPU/IO too.
+
+[Service]
+Type=oneshot
+Nice=10
+IOSchedulingClass=idle
+ExecStart=/usr/bin/env folk promote
+# Adjust to the venv/user folk is installed under on your promotion host.

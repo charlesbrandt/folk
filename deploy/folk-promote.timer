@@ -1,0 +1,12 @@
+[Unit]
+Description=Nightly folk session-end promotion job
+
+[Timer]
+# Nightly, not a session-end hook -- batch is simpler, the model is likely
+# idle at night, and same-day latency is not a requirement (spec's
+# "Trigger and idempotency"). Pick a quiet local hour.
+OnCalendar=*-*-* 03:15:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target
