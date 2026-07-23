@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The journal — folk concepts</title>
+<link rel="stylesheet" href="folk.css">
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <span class="nav-title">folk</span>
+    <a href="index.html">Overview</a>
+    <a href="three-records.html">Three records</a>
+    <a href="trust.html">Trust tiers</a>
+    <a href="journal.html" aria-current="page">The journal</a>
+    <a href="promotion.html">Promotion &amp; review</a>
+    <a href="domains.html">Domains &amp; loci</a>
+    <a href="phases.html">Phases &amp; roadmap</a>
+  </div>
+</header>
+
+<main class="wrap">
+
+<h1>The journal: what happened, forever</h1>
+<p class="lede">The journal is folk's event log — the append-only record of what actually happened: who said what, what a tool observed, what an LLM proposed, what a human decided. It is the only record machines may write into, and the discipline around it is strict precisely because of that.</p>
+
+<h2>Anatomy of an event</h2>
+<p>One event per line, NDJSON. Here is a <code>promotion</code> event — the richest kind — annotated:</p>
+
+<pre><code>{"<span class="f-muted">v</span>": 1, "<span class="f-muted">id</span>": "8c1f0a2b9d3e", "<span class="f-muted">ts</span>": "2026-07-14T03:11:02Z",
+ "<span class="f-interp">actor</span>": "agent:assistant-main", "<span class="f-jrnl">kind</span>": "promotion",
+ "<span class="f-stated">evidence</span>": "stated", "<span class="f-human">level</span>": "core",
+ "<strong>s</strong>": "person:sam", "<strong>p</strong>": "works_at", "<strong>o</strong>": "org:studio-b",
+ "<span class="f-stated">src</span>": "msg:20260514_025200_91059e71#12",
+ "<span class="f-muted">session</span>": "conv:20260514_025200_91059e71",
+ "<span class="f-muted">when</span>": "2026-05",
+ "<span class="f-stated">note</span>": "\"I've been at Studio B since May\" — current job"}</code></pre>
+
+<ul>
+  <li><strong><code>s</code> / <code>p</code> / <code>o</code></strong> — the claim itself, as a subject–predicate–object triple. Slugs are lowercase, hyphenated, type-prefixed (<code>person:</code>, <code>work:</code>, <code>topic:</code>, <code>locus:</code>); predicates come from <code>vocab.json</code> or arrive with a one-line <code>p_def</code> as a coinage proposal.</li>
+  <li><strong><span class="f-interp"><code>actor</code></span></strong> — who wrote it: <code>human</code>, <code>agent:&lt;name&gt;</code>, or a mechanical tool version like <code>extract:v1</code>. This is one of the three inputs to the <a href="trust.html">trust tier</a>.</li>
+  <li><strong><span class="f-stated"><code>evidence</code> + <code>src</code> + <code>note</code></span></strong> — the backing. For <code>stated</code>, the note must contain the verbatim quote and lint verifies it appears in the message <code>src</code> points at, spoken by the fact's subject.</li>
+  <li><strong><span class="f-human"><code>level</code></span></strong> — <code>core</code> (ordinary durable fact) or <code>bedrock</code> (identity-level → only ever a suggestion to the human).</li>
+  <li><strong><span class="f-muted"><code>id</code></span></strong> — 12 hex chars of sha256 over <code>ts|actor|s|p|o</code>, computed at append time. Recomputable, so lint verifies it — and it's what later <code>review</code>/<code>redaction</code> events point at with <code>ref</code>.</li>
+  <li><strong><span class="f-muted"><code>ts</code> vs <code>when</code></span></strong> — when the event was <em>recorded</em> vs the fact's own time anchor. "Started at Studio B in May" recorded in July: <code>ts</code> is July, <code>when</code> is May.</li>
+</ul>
+
+<h2>The five kinds</h2>
+<table>
+  <tr><th>Kind</th><th>Written by</th><th>What it is</th></tr>
+  <tr><td><code>session</code></td><td>extract step (mechanical)</td><td>One per processed conversation — marks it present, carries conversation-level facts and the <code>counterparty</code> list review tooling filters on.</td></tr>
+  <tr><td><code>observation</code></td><td>deterministic tools only</td><td>Mechanical record: participants, utterances, adapter exports (a track played, a search run). No LLM, ever — that's what earns <span class="chip obs">observed</span>.</td></tr>
+  <tr><td><code>promotion</code></td><td>an LLM, as <code>agent:&lt;name&gt;</code></td><td>A <em>proposal</em> that a fact deserves an index triple, with <code>evidence</code>, <code>level</code>, and a lint-verifiable trail. The only event kind an LLM produces, anywhere in folk.</td></tr>
+  <tr><td><code>review</code></td><td><code>human</code>, always</td><td>A decision: <code>verdict: accept | reject</code> on the event <code>ref</code> points at. Decisions are themselves journal events — the decision history is auditable and replayable.</td></tr>
+  <tr><td><code>redaction</code></td><td><code>human</code>, always</td><td>The one sanctioned exception to "nothing is forgotten", for privacy. Replay expunges the ref'd event entirely — triples <em>and</em> drill-down — which is stronger than a reject.</td></tr>
+</table>
+
+<h2>Append-only, corrected forward</h2>
+<p>Segments are never edited. Not for typos, not for retractions, not for canonicalization. Every correction is a <em>later event</em> that refers to the earlier one — so the record of being wrong, and of noticing, is itself part of the record.</p>
+
+<figure class="diagram" id="fig-append-only">
+<svg viewBox="0 0 960 330" role="img" aria-label="A journal segment as a strip of appended events; review and redaction events point back at earlier events by id; editing in place is forbidden">
+  <defs>
+    <marker id="m5" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--muted)"/>
+    </marker>
+    <marker id="m5d" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--danger)"/>
+    </marker>
+  </defs>
+
+  <!-- ref arcs -->
+  <path class="d-arrow-dash" d="M635,112 C560,45 370,45 300,112" marker-end="url(#m5)"/>
+  <text class="d-ts" x="467" y="55" text-anchor="middle">ref: id → verdict applied at replay</text>
+  <path class="d-arrow-danger" stroke-dasharray="6 5" d="M805,112 C640,10 280,10 130,108" marker-end="url(#m5d)"/>
+  <text class="d-ts t-danger" x="467" y="18" text-anchor="middle">ref: id → expunged from replay entirely</text>
+
+  <!-- segment strip -->
+  <rect class="d-box" x="30" y="100" width="900" height="100" rx="10"/>
+  <text class="d-tm" x="44" y="122">2026-07.server.ndjson</text>
+  <text class="d-ts" x="856" y="122">append →</text>
+
+  <rect class="d-box d-obs" x="50" y="134" width="150" height="52" rx="6"/>
+  <text class="d-ts" x="60" y="155">observation</text>
+  <text class="d-tm" x="60" y="174">uttered · msg:#4</text>
+
+  <rect class="d-box d-stated" x="220" y="134" width="150" height="52" rx="6"/>
+  <text class="d-ts" x="230" y="155">promotion</text>
+  <text class="d-tm" x="230" y="174">stated · core</text>
+
+  <rect class="d-box d-interp" x="390" y="134" width="150" height="52" rx="6"/>
+  <text class="d-ts" x="400" y="155">promotion</text>
+  <text class="d-tm" x="400" y="174">interpreted · bedrock</text>
+
+  <rect class="d-box d-human" x="560" y="134" width="150" height="52" rx="6"/>
+  <text class="d-ts" x="570" y="155">review (human)</text>
+  <text class="d-tm" x="570" y="174">reject · ref</text>
+
+  <rect class="d-box d-danger" x="730" y="134" width="150" height="52" rx="6"/>
+  <text class="d-ts" x="740" y="155">redaction (human)</text>
+  <text class="d-tm" x="740" y="174">ref · privacy</text>
+
+  <!-- notes -->
+  <text class="d-t" x="50" y="240"><tspan class="d-tb">reject</tspan> — triples dropped from the index; the event stays readable in the journal</text>
+  <text class="d-t" x="50" y="266"><tspan class="d-tb t-danger">redaction</tspan> — gone from replay: triples, drill-down, everything; human-only, never generalized</text>
+  <text class="d-tm" x="50" y="304">✎ edit an event in place</text>
+  <line x1="46" y1="299" x2="240" y2="299" stroke="var(--danger)" stroke-width="2"/>
+  <text class="d-t t-danger" x="260" y="304">never — not even for canonicalization; aliases are a rebuild-time projection</text>
+</svg>
+<figcaption><strong>Corrections point backward; the pen only moves forward.</strong> The <code>id</code> field exists exactly so that later events can say which earlier event they resolve.</figcaption>
+</figure>
+
+<h2>Roots and segments: where journal files live</h2>
+<p>There is no single global journal. A <strong>journal root</strong> is a directory of segments scoped to one collection — <em>roots follow domain, not writer</em> — so an agent conversing with you writes to <code>personal</code>'s root while a roleplaying character writes to <code>characters</code>', and the domains never lump together. Registration is config, two ways: automatically (a collection directory containing <code>journal/</code>) or explicitly (<code>~/.config/folk/journal-roots</code>, for roots that live next to their producer, like an external adapter's own database directory).</p>
+
+<figure class="diagram" id="fig-roots-segments">
+<svg viewBox="0 0 960 360" role="img" aria-label="Per-domain journal roots each containing per-writer monthly segments; server staging syncs into the personal root">
+  <defs>
+    <marker id="m6" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--muted)"/>
+    </marker>
+  </defs>
+
+  <rect class="d-box d-jrnl" x="30" y="40" width="280" height="160" rx="10"/>
+  <text class="d-tb" x="46" y="66">personal — root</text>
+  <text class="d-tm" x="46" y="88">~/…/personal/journal/</text>
+  <rect class="d-box" x="46" y="104" width="248" height="34" rx="6"/>
+  <text class="d-tm" x="58" y="126">2026-07.laptop.ndjson</text>
+  <rect class="d-box" x="46" y="148" width="248" height="34" rx="6"/>
+  <text class="d-tm" x="58" y="170">2026-07.server.ndjson</text>
+
+  <rect class="d-box d-jrnl" x="340" y="40" width="280" height="160" rx="10"/>
+  <text class="d-tb" x="356" y="66">characters — root</text>
+  <text class="d-tm" x="356" y="88">~/…/characters/journal/</text>
+  <rect class="d-box" x="356" y="104" width="248" height="34" rx="6"/>
+  <text class="d-tm" x="368" y="126">2026-07.server.ndjson</text>
+  <text class="d-ts" x="356" y="180">auto-registered: journal/ exists</text>
+
+  <rect class="d-box d-jrnl" x="650" y="40" width="280" height="160" rx="10"/>
+  <text class="d-tb" x="666" y="66">adapter-side — root</text>
+  <text class="d-tm" x="666" y="88">next to the adapter's own database</text>
+  <rect class="d-box" x="666" y="104" width="248" height="34" rx="6"/>
+  <text class="d-tm" x="678" y="126">2026-07.media-adapter.ndjson</text>
+  <text class="d-ts" x="666" y="180">explicit: ~/.config/folk/journal-roots</text>
+
+  <rect class="d-box" x="30" y="270" width="280" height="60" rx="10"/>
+  <text class="d-tb" x="46" y="294">Server staging</text>
+  <text class="d-tm" x="46" y="316">~/.folk-staging/personal/…</text>
+  <path class="d-arrow" d="M170,265 V190" marker-end="url(#m6)"/>
+  <text class="d-ts" x="182" y="232">plain file sync — safe because</text>
+  <text class="d-ts" x="182" y="250">only the server ever writes this file</text>
+
+  <text class="d-t" x="420" y="264"><tspan class="d-tb">per-writer segments:</tspan> the filename carries the writer,</text>
+  <text class="d-t" x="420" y="288">so two machines never touch the same file —</text>
+  <text class="d-t" x="420" y="312">no locks, no merges, no conflicts, by construction</text>
+</svg>
+<figcaption><strong>Domain scope comes from the root; write safety comes from the filename.</strong> An event's collection is a fact about <em>where it lives</em>, not a field that could be wrong. Replay globs every segment in every root and orders by timestamp.</figcaption>
+</figure>
+
+<h2>Readers are forgiving; writers are strict</h2>
+<p>The schema is frozen and lint enforces it hard at write time — but readers follow a deliberately <strong>weak-schema policy</strong>: unknown fields are ignored, unknown <code>kind</code> or <code>v</code> values are skipped with a warning, never a crash. That asymmetry is cheap insurance from the event-sourcing literature: it means <code>v: 2</code> events could coexist with <code>v: 1</code> readers during a migration instead of forcing a flag-day rewrite of every consumer.</p>
+
+<div class="invariant">
+  <span class="tag">Invariant 6</span>
+  <p>Lint before append. Any programmatic append runs the lint first; hard failures quarantine the whole batch for <code>folk review</code> — nothing partial ever lands.</p>
+</div>
+
+<p>What lint checks: schema shape per kind, <code>id</code> recomputation, slug rules, resolvable <code>src</code> pointers, the 5-word shingle quote match, speaker attribution (a <code>stated</code> fact's subject must be the cited message's speaker), and duplicate triples within a promotion batch. Coined predicates and near-duplicate entity slugs are <em>soft</em> output — proposals for <a href="promotion.html">review</a>, not errors. Lint is the executable form of <code>docs/design/journal-schema.md</code>; if they disagree, one of them is a bug.</p>
+
+<nav class="pagenav">
+  <a href="trust.html">← Trust tiers</a>
+  <a href="promotion.html">Promotion &amp; review →</a>
+</nav>
+
+</main>
+
+<footer>
+  <div class="footer-inner">
+    Concept documentation for the <strong>folk</strong> project · sources: <code>docs/design/journal-schema.md</code>, <code>docs/design/journal-in-folk.md</code> · diagrams tracked in <code>docs/site/DIAGRAMS.md</code>
+  </div>
+</footer>
+
+</body>
+</html>

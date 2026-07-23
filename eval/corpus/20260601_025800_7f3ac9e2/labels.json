@@ -1,0 +1,15 @@
+{
+  "_source": "prototypes/journal-promotion/journal/2026-06-promotions.ndjson -- the hand-authored reference set for the synthetic 2026-06-01 Hermes session (see prototypes/journal-promotion/README.md). Evidence/level are carried through for documentation only; matching is on (s, p, o) after alias canonicalization, per promotion-eval.md Decision 2.",
+  "reference": [
+    {"s": "person:mara", "p": "worked_through", "o": "work:parish-archive", "evidence": "stated", "level": "core", "when": "2025-12"},
+    {"s": "person:mara", "p": "interested_in", "o": "topic:collecting-local-history-stories", "evidence": "stated", "level": "core"},
+    {"s": "person:mara", "p": "prioritizes", "o": "project:garden-tracker", "evidence": "stated", "level": "core", "when": "2026-06-01"},
+    {"s": "agent:hermes-main", "p": "assessed_most_meaningful", "o": "media:parish-oral-history-03", "evidence": "interpreted", "level": "core"},
+    {"s": "person:mara", "p": "values", "o": "value:self-reliance", "evidence": "interpreted", "level": "bedrock"},
+    {"s": "person:mara", "p": "values", "o": "value:rootedness", "evidence": "interpreted", "level": "bedrock"},
+    {"s": "person:mara", "p": "values", "o": "value:hands-on-craft", "evidence": "interpreted", "level": "bedrock"},
+    {"s": "person:mara", "p": "defining_moment", "o": "moment:radio-workshop-refuge", "evidence": "interpreted", "level": "bedrock"}
+  ],
+  "acceptable_extras": [],
+  "known_false": []
+}

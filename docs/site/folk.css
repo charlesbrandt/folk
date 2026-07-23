@@ -1,0 +1,332 @@
+/* folk concept docs — shared stylesheet.
+   Light/dark via CSS variables; inline SVG diagrams consume the same variables. */
+
+:root {
+  --bg: #faf9f5;
+  --surface: #ffffff;
+  --text: #26241f;
+  --muted: #6b675e;
+  --line: #d8d4c9;
+  --code-bg: #f1efe7;
+
+  /* trust tiers */
+  --human: #96690b;        /* curated / bedrock — gold */
+  --observed: #1e7b38;     /* mechanical record — green */
+  --stated: #1d5fbf;       /* quoted statement — blue */
+  --interpreted: #7d3bbd;  /* inference — purple */
+
+  /* records */
+  --journal: #1d766b;      /* append-only journal — teal */
+  --index: #5b6472;        /* derived cache — slate */
+  --danger: #b3382c;       /* quarantine / poisoning */
+
+  --human-bg: #f6ecd6;
+  --observed-bg: #e3f1e6;
+  --stated-bg: #e2ecfa;
+  --interpreted-bg: #efe4f9;
+  --journal-bg: #e0efed;
+  --index-bg: #e9ebee;
+  --danger-bg: #f8e4e1;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1a1913;
+    --surface: #22211a;
+    --text: #e8e4d8;
+    --muted: #a29b8c;
+    --line: #3c392f;
+    --code-bg: #2a2921;
+
+    --human: #e0a83a;
+    --observed: #5fc06f;
+    --stated: #6ea8ff;
+    --interpreted: #c08aef;
+
+    --journal: #55b8ac;
+    --index: #9aa4b5;
+    --danger: #ef7b6d;
+
+    --human-bg: #35301f;
+    --observed-bg: #20301f;
+    --stated-bg: #1f2a3d;
+    --interpreted-bg: #2e2438;
+    --journal-bg: #1e2f2c;
+    --index-bg: #282c33;
+    --danger-bg: #3a231f;
+  }
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  line-height: 1.6;
+  font-size: 16px;
+}
+
+/* ---------- navigation ---------- */
+
+.nav {
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.nav-inner {
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: 0.5rem 1.25rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem 1rem;
+}
+
+.nav-title {
+  font-weight: 700;
+  font-size: 1.05rem;
+  margin-right: 0.5rem;
+}
+
+.nav a {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 0.9rem;
+  padding: 0.15rem 0;
+}
+
+.nav a:hover { color: var(--text); }
+
+.nav a[aria-current="page"] {
+  color: var(--text);
+  font-weight: 600;
+  border-bottom: 2px solid var(--human);
+}
+
+/* ---------- layout ---------- */
+
+.wrap {
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem 4rem;
+}
+
+h1 { font-size: 1.9rem; line-height: 1.25; margin: 1.2rem 0 0.4rem; }
+h2 { font-size: 1.35rem; margin: 2.2rem 0 0.5rem; }
+h3 { font-size: 1.05rem; margin: 1.6rem 0 0.4rem; }
+
+.lede {
+  font-size: 1.1rem;
+  color: var(--muted);
+  max-width: 46rem;
+  margin-top: 0;
+}
+
+p, li { max-width: 46rem; }
+
+a { color: var(--stated); }
+
+hr { border: none; border-top: 1px solid var(--line); margin: 2.5rem 0; }
+
+/* ---------- figures & diagrams ---------- */
+
+figure.diagram {
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow-x: auto;
+}
+
+figure.diagram svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  min-width: 560px;
+}
+
+figure.diagram figcaption {
+  margin-top: 0.75rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+  max-width: none;
+}
+
+figure.diagram figcaption strong { color: var(--text); }
+
+/* SVG primitives — diagrams style themselves with these classes */
+.d-box   { fill: var(--surface); stroke: var(--line); stroke-width: 1.5; rx: 8; }
+.d-human { fill: var(--human-bg); stroke: var(--human); }
+.d-obs   { fill: var(--observed-bg); stroke: var(--observed); }
+.d-stated{ fill: var(--stated-bg); stroke: var(--stated); }
+.d-interp{ fill: var(--interpreted-bg); stroke: var(--interpreted); }
+.d-jrnl  { fill: var(--journal-bg); stroke: var(--journal); }
+.d-idx   { fill: var(--index-bg); stroke: var(--index); }
+.d-danger{ fill: var(--danger-bg); stroke: var(--danger); }
+.d-ghost { fill: none; stroke: var(--muted); stroke-dasharray: 5 4; }
+
+.d-t     { fill: var(--text); font-family: system-ui, sans-serif; font-size: 14px; }
+.d-tb    { fill: var(--text); font-family: system-ui, sans-serif; font-size: 14px; font-weight: 600; }
+.d-ts    { fill: var(--muted); font-family: system-ui, sans-serif; font-size: 12px; }
+.d-tm    { fill: var(--muted); font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 12px; }
+.d-tmb   { fill: var(--text); font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 12.5px; font-weight: 600; }
+
+.d-arrow { stroke: var(--muted); stroke-width: 1.6; fill: none; }
+.d-arrow-strong { stroke: var(--text); stroke-width: 2; fill: none; }
+.d-arrow-danger { stroke: var(--danger); stroke-width: 1.8; fill: none; }
+.d-arrow-dash { stroke: var(--muted); stroke-width: 1.6; fill: none; stroke-dasharray: 6 5; }
+
+.t-human  { fill: var(--human); }
+.t-obs    { fill: var(--observed); }
+.t-stated { fill: var(--stated); }
+.t-interp { fill: var(--interpreted); }
+.t-jrnl   { fill: var(--journal); }
+.t-idx    { fill: var(--index); }
+.t-danger { fill: var(--danger); }
+
+/* ---------- prose components ---------- */
+
+.invariant {
+  border-left: 4px solid var(--human);
+  background: var(--surface);
+  border-radius: 0 8px 8px 0;
+  padding: 0.75rem 1rem;
+  margin: 1.25rem 0;
+  max-width: 46rem;
+}
+
+.invariant .tag {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--human);
+  margin-bottom: 0.2rem;
+}
+
+.invariant p { margin: 0.2rem 0 0; }
+
+pre {
+  background: var(--code-bg);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0.9rem 1rem;
+  overflow-x: auto;
+  font-size: 0.83rem;
+  line-height: 1.55;
+  max-width: 46rem;
+}
+
+code {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.86em;
+  background: var(--code-bg);
+  border-radius: 4px;
+  padding: 0.08em 0.3em;
+}
+
+pre code { background: none; padding: 0; font-size: inherit; }
+
+/* annotated event fields */
+.f-human  { color: var(--human); font-weight: 600; }
+.f-obs    { color: var(--observed); font-weight: 600; }
+.f-stated { color: var(--stated); font-weight: 600; }
+.f-interp { color: var(--interpreted); font-weight: 600; }
+.f-jrnl   { color: var(--journal); font-weight: 600; }
+.f-muted  { color: var(--muted); }
+
+/* tier chips */
+.chip {
+  display: inline-block;
+  font-size: 0.76rem;
+  font-weight: 600;
+  border-radius: 999px;
+  padding: 0.05rem 0.6rem;
+  border: 1.5px solid;
+  vertical-align: middle;
+}
+.chip.human  { color: var(--human); border-color: var(--human); background: var(--human-bg); }
+.chip.obs    { color: var(--observed); border-color: var(--observed); background: var(--observed-bg); }
+.chip.stated { color: var(--stated); border-color: var(--stated); background: var(--stated-bg); }
+.chip.interp { color: var(--interpreted); border-color: var(--interpreted); background: var(--interpreted-bg); }
+.chip.jrnl   { color: var(--journal); border-color: var(--journal); background: var(--journal-bg); }
+.chip.idx    { color: var(--index); border-color: var(--index); background: var(--index-bg); }
+.chip.danger { color: var(--danger); border-color: var(--danger); background: var(--danger-bg); }
+
+/* ---------- tables ---------- */
+
+table {
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.9rem;
+  width: 100%;
+  max-width: 52rem;
+}
+
+th, td {
+  text-align: left;
+  padding: 0.45rem 0.75rem;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+
+th { color: var(--muted); font-weight: 600; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; }
+
+/* ---------- card grid (index) ---------- */
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.card {
+  display: block;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 1rem 1.1rem;
+  text-decoration: none;
+  color: var(--text);
+}
+
+.card:hover { border-color: var(--muted); }
+.card h3 { margin: 0 0 0.35rem; font-size: 1rem; }
+.card p { margin: 0; font-size: 0.85rem; color: var(--muted); }
+
+/* ---------- footer ---------- */
+
+footer {
+  border-top: 1px solid var(--line);
+  margin-top: 2rem;
+}
+
+.footer-inner {
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: 1.25rem;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.footer-inner code { font-size: 0.95em; }
+
+/* next/prev */
+.pagenav {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 3rem;
+  gap: 1rem;
+  font-size: 0.9rem;
+}

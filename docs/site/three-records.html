@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Three records — folk concepts</title>
+<link rel="stylesheet" href="folk.css">
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <span class="nav-title">folk</span>
+    <a href="index.html">Overview</a>
+    <a href="three-records.html" aria-current="page">Three records</a>
+    <a href="trust.html">Trust tiers</a>
+    <a href="journal.html">The journal</a>
+    <a href="promotion.html">Promotion &amp; review</a>
+    <a href="domains.html">Domains &amp; loci</a>
+    <a href="phases.html">Phases &amp; roadmap</a>
+  </div>
+</header>
+
+<main class="wrap">
+
+<h1>Three records, one authority each</h1>
+<p class="lede">Everything folk stores lives in exactly one of three places, and each place is the single authority for one kind of truth. This is invariant #1, and it is the load-bearing wall: every other design decision leans on it.</p>
+
+<figure class="diagram" id="fig-three-records">
+<svg viewBox="0 0 960 410" role="img" aria-label="Three record types side by side: person files written by the human, journal appended by agents and tools, index written only by rebuild">
+  <defs>
+    <marker id="m2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--muted)"/>
+    </marker>
+  </defs>
+
+  <!-- writers row -->
+  <text class="d-tb" x="165" y="40" text-anchor="middle">the human</text>
+  <text class="d-ts" x="165" y="58" text-anchor="middle">(and only the human)</text>
+  <text class="d-tb" x="480" y="40" text-anchor="middle">agents &amp; mechanical tools</text>
+  <text class="d-ts" x="480" y="58" text-anchor="middle">(append only, lint first)</text>
+  <text class="d-tmb" x="795" y="40" text-anchor="middle">folk index --rebuild</text>
+  <text class="d-ts" x="795" y="58" text-anchor="middle">(nothing else, ever)</text>
+
+  <line class="d-arrow" x1="165" y1="68" x2="165" y2="112" marker-end="url(#m2)"/>
+  <line class="d-arrow" x1="480" y1="68" x2="480" y2="112" marker-end="url(#m2)"/>
+  <line class="d-arrow" x1="795" y1="68" x2="795" y2="112" marker-end="url(#m2)"/>
+
+  <!-- person files -->
+  <rect class="d-box d-human" x="30" y="118" width="270" height="190" rx="10"/>
+  <text class="d-tb" x="46" y="146">Person files</text>
+  <text class="d-t" x="46" y="172">authority for:</text>
+  <text class="d-tb t-human" x="46" y="192">what the human curated</text>
+  <text class="d-ts" x="46" y="220">markdown, git-tracked</text>
+  <text class="d-tm" x="46" y="244">{coll}/{i}/{slug}/{slug}.md</text>
+  <text class="d-ts" x="46" y="270">Bedrock tier: identity,</text>
+  <text class="d-ts" x="46" y="288">associations, voice, tags</text>
+
+  <!-- journal -->
+  <rect class="d-box d-jrnl" x="345" y="118" width="270" height="190" rx="10"/>
+  <text class="d-tb" x="361" y="146">The journal</text>
+  <text class="d-t" x="361" y="172">authority for:</text>
+  <text class="d-tb t-jrnl" x="361" y="192">what happened</text>
+  <text class="d-ts" x="361" y="220">append-only NDJSON segments</text>
+  <text class="d-tm" x="361" y="244">journal/2026-07.server.ndjson</text>
+  <text class="d-ts" x="361" y="270">corrections are later events,</text>
+  <text class="d-ts" x="361" y="288">never rewrites</text>
+
+  <!-- index -->
+  <rect class="d-box d-idx" x="660" y="118" width="270" height="190" rx="10" stroke-dasharray="6 4"/>
+  <text class="d-tb" x="676" y="146">The triple index</text>
+  <text class="d-t" x="676" y="172">authority for:</text>
+  <text class="d-tb t-idx" x="676" y="192">nothing — a derived cache</text>
+  <text class="d-ts" x="676" y="220">NDJSON, the only thing</text>
+  <text class="d-tm" x="676" y="244">~/.folk/triples.ndjson</text>
+  <text class="d-ts" x="676" y="270">deletable at any time;</text>
+  <text class="d-ts" x="676" y="288">rebuild restores it exactly</text>
+
+  <!-- derivation arrows -->
+  <path class="d-arrow" d="M300,330 C400,375 560,375 655,340" fill="none" marker-end="url(#m2)"/>
+  <path class="d-arrow" d="M615,325 C630,335 640,338 653,338" fill="none"/>
+  <text class="d-ts" x="480" y="395" text-anchor="middle">both replayed deterministically into the index at rebuild</text>
+  <path class="d-arrow" d="M345,330 C420,368 560,368 655,336" fill="none" opacity="0"/>
+</svg>
+<figcaption><strong>One authority each.</strong> The gold record is human-owned, the teal record is history, the slate record is a cache. The dashed border is the point: if the index disagrees with the other two, the index is wrong by definition — delete it and rebuild.</figcaption>
+</figure>
+
+<h2>Why a disposable cache is a feature</h2>
+<p>Most memory systems accumulate state that slowly becomes its own authority: a database that can't be regenerated, embeddings nobody can audit, scores that drifted. folk avoids this. The index is <em>defined</em> as a pure projection of the other two records, which buys three things:</p>
+<ul>
+  <li><strong>Migration is trivial.</strong> Change the index record shape? Delete the file, rebuild. That's the entire migration story, and it has already been used in production.</li>
+  <li><strong>Corruption is impossible to keep.</strong> Any bad state in the index has a half-life of one rebuild. This is also why nothing but rebuild may write it — a directly-written index line is silently destroyed by the next rebuild, so "write the index directly" isn't a shortcut, it's a data-loss bug.</li>
+  <li><strong>Agent memories survive anyway.</strong> Deleting the index does not delete what agents recorded — that lives in the journal, and replay brings it back. The cache being cheap is what makes the journal being sacred affordable.</li>
+</ul>
+
+<div class="invariant">
+  <span class="tag">Invariant 2</span>
+  <p>Nothing but <code>folk index --rebuild</code> writes the index. Agents and commands write person files (human-driven) or append journal events — never index lines.</p>
+</div>
+
+<h2>The rebuild is a pure function</h2>
+<p>Rebuild parses person files from every configured collection (human tier), replays every journal segment across every registered root (the machine tiers), applies review verdicts, redactions, and slug aliases as projections, and writes the sorted result. There is no LLM, no wall clock, no filesystem-order dependence anywhere in this path — run it twice and the output is byte-identical. That property is a hard test in the suite, not an aspiration.</p>
+
+<figure class="diagram" id="fig-rebuild-pure">
+<svg viewBox="0 0 960 320" role="img" aria-label="Rebuild as a pure function: person files, journal segments and vocab aliases flow into a deterministic replay which produces the index; running twice produces byte-identical output">
+  <defs>
+    <marker id="m3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--muted)"/>
+    </marker>
+  </defs>
+
+  <rect class="d-box d-human" x="30" y="30" width="230" height="56" rx="8"/>
+  <text class="d-tb" x="44" y="53">Person files</text>
+  <text class="d-ts" x="44" y="73">all collections → human tier</text>
+
+  <rect class="d-box d-jrnl" x="30" y="120" width="230" height="56" rx="8"/>
+  <text class="d-tb" x="44" y="143">Journal segments</text>
+  <text class="d-ts" x="44" y="163">all roots, sorted, replayed</text>
+
+  <rect class="d-box" x="30" y="210" width="230" height="56" rx="8"/>
+  <text class="d-tmb" x="44" y="233">vocab.json</text>
+  <text class="d-ts" x="44" y="253">aliases applied as projection</text>
+
+  <rect class="d-box d-idx" x="360" y="95" width="250" height="110" rx="10"/>
+  <text class="d-tb" x="376" y="122">Deterministic replay</text>
+  <text class="d-ts" x="376" y="146">stable sort · fixed separators</text>
+  <text class="d-ts" x="376" y="164">no wall clock · no LLM</text>
+  <text class="d-ts" x="376" y="182">reviews + redactions applied</text>
+
+  <rect class="d-box" x="700" y="55" width="230" height="52" rx="8"/>
+  <text class="d-tmb" x="714" y="77">triples.ndjson</text>
+  <text class="d-ts" x="714" y="96">run 1</text>
+
+  <rect class="d-box" x="700" y="185" width="230" height="52" rx="8"/>
+  <text class="d-tmb" x="714" y="207">triples.ndjson</text>
+  <text class="d-ts" x="714" y="226">run 2</text>
+
+  <text class="d-tb" x="815" y="152" text-anchor="middle">≡  byte-identical</text>
+
+  <line class="d-arrow" x1="260" y1="58" x2="355" y2="115" marker-end="url(#m3)"/>
+  <line class="d-arrow" x1="260" y1="148" x2="355" y2="148" marker-end="url(#m3)"/>
+  <line class="d-arrow" x1="260" y1="238" x2="355" y2="185" marker-end="url(#m3)"/>
+  <line class="d-arrow" x1="610" y1="125" x2="695" y2="88" marker-end="url(#m3)"/>
+  <line class="d-arrow" x1="610" y1="175" x2="695" y2="205" marker-end="url(#m3)"/>
+</svg>
+<figcaption><strong>Run twice → identical bytes.</strong> Determinism is what makes the cache trustworthy without being authoritative: anyone can verify the index against its sources by rebuilding.</figcaption>
+</figure>
+
+<h2>What an index record looks like</h2>
+<pre><code>{"s": "person:sam", "p": "works_at", "o": "org:studio-b",
+ "tier": "observed", "col": "personal",
+ "src": "msg:20260514_025200_91059e71#12",
+ "when": "2026-05", "last_reinforced": "2026-07-14T03:11:02Z"}</code></pre>
+<p>Two derived fields are worth noticing. <code>tier</code> replaces the old <code>prov</code>/<code>conf</code> pair — see <a href="trust.html">Trust tiers</a>. <code>last_reinforced</code> is the max timestamp across all journal events asserting the same triple: re-observing a fact in a later conversation refreshes it automatically, and nothing ever has to write "freshness" anywhere. The Archivist's <a href="phases.html#decay">decay lens</a> reads this field; it never writes anything.</p>
+
+<h2>Where the human tier comes from</h2>
+<p>A person file is deliberately boring markdown. Every <code>##</code> section is a convention, not a schema — <code>folk</code> parses the ones it knows and leaves the rest alone:</p>
+<pre><code># Toru Watanabe
+
+Narrator and protagonist of Norwegian Wood.
+
+## Archetype
+quiet observer
+
+## Voice
+understated, first-person, wry
+
+## Associations
+- [Norwegian Wood](work:norwegian-wood) — appears_in
+
+## Tags
+character
+
+## Defining moments
+- ...</code></pre>
+<p>Commands like <code>folk link</code> and <code>folk tag</code> edit these files (then trigger a rebuild) — they never touch the index directly. And when the review queue accepts a bedrock suggestion into a person file, it shows the exact diff and asks: <em>the tool is a typist, not an author</em>.</p>
+
+<div class="invariant">
+  <span class="tag">The rule of thumb</span>
+  <p>When deciding where any new piece of state belongs, ask: is it a human judgment (person file), a thing that happened (journal event), or derivable from the first two (rebuild projection)? If it seems to need two homes, the design is wrong.</p>
+</div>
+
+<nav class="pagenav">
+  <a href="index.html">← Overview</a>
+  <a href="trust.html">Trust tiers →</a>
+</nav>
+
+</main>
+
+<footer>
+  <div class="footer-inner">
+    Concept documentation for the <strong>folk</strong> project · sources: <code>docs/design/journal-in-folk.md</code>, <code>CLAUDE.md</code> invariants 1–4 · diagrams tracked in <code>docs/site/DIAGRAMS.md</code>
+  </div>
+</footer>
+
+</body>
+</html>

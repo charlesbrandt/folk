@@ -1,0 +1,25 @@
+{
+  "_note": "Frozen vocab.json for the eval harness only (promotion-eval.md Decision 4) -- deliberately separate from ~/.config/folk/vocab.json so scoring is reproducible across machines and time, never silently drifting with someone's live, uncommitted config (invariant 7: this is config, not code, and it's committed like eval/baseline.json). The two aliases below resolve the entity-slug drift COMPARISON.md's second pass documented (finding 2) for the synthetic 2026-06-01 fixture session -- they are the literal example journal-in-folk.md uses for the aliases mechanism.",
+  "slug_rules": "lowercase ascii, hyphen-separated, type prefix required",
+  "types": ["person", "agent", "conv", "msg", "platform", "tag", "topic", "project", "value", "work", "moment", "media", "place", "event"],
+  "predicates": {
+    "participated_in": "subject took part in a conversation or event",
+    "uttered": "subject said the message pointed to (journal-only, never indexed)",
+    "opened_on": "conversation happened on a platform",
+    "tagged": "subject carries a tag",
+    "associated": "generic association between two entities",
+    "interested_in": "subject has an ongoing interest in a topic",
+    "prioritizes": "subject currently ranks this project or topic first (time-scoped; use when)",
+    "worked_through": "subject processed or studied a body of material",
+    "worked_on": "subject built or contributed to a project",
+    "values": "subject holds this as a guiding value (identity-level: level=bedrock)",
+    "believes": "subject holds this statement or axiom as true (identity-level: level=bedrock)",
+    "defining_moment": "an identity-shaping experience of the subject (identity-level: level=bedrock)",
+    "motivated_by": "an underlying driver inferred for the subject",
+    "assessed_most_meaningful": "an agent's judgment ranking an artifact's significance"
+  },
+  "aliases": {
+    "topic:local-history-stories": "topic:collecting-local-history-stories",
+    "work:parish-records-md": "work:parish-archive"
+  }
+}

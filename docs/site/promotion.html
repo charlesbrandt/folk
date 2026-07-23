@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Promotion &amp; review — folk concepts</title>
+<link rel="stylesheet" href="folk.css">
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <span class="nav-title">folk</span>
+    <a href="index.html">Overview</a>
+    <a href="three-records.html">Three records</a>
+    <a href="trust.html">Trust tiers</a>
+    <a href="journal.html">The journal</a>
+    <a href="promotion.html" aria-current="page">Promotion &amp; review</a>
+    <a href="domains.html">Domains &amp; loci</a>
+    <a href="phases.html">Phases &amp; roadmap</a>
+  </div>
+</header>
+
+<main class="wrap">
+
+<h1>How a conversation becomes memory</h1>
+<p class="lede">Every night on the server, <code>folk promote</code> turns quiescent conversations into journal events: a mechanical extract that always succeeds, an LLM proposal step that is never trusted, a deterministic lint that gates everything, and a human review queue where durability is actually decided. <em>LLM proposes; script disposes.</em></p>
+
+<figure class="diagram" id="fig-promotion-pipeline">
+<svg viewBox="0 0 960 430" role="img" aria-label="The promotion pipeline: session transcript to mechanical extract to journal; transcript to LLM promote to lint; lint-clean batches append, hard errors quarantine; both feed the review queue">
+  <defs>
+    <marker id="m7" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--muted)"/>
+    </marker>
+    <marker id="m7d" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--danger)"/>
+    </marker>
+  </defs>
+
+  <!-- row 1 -->
+  <rect class="d-box" x="30" y="40" width="180" height="64" rx="8"/>
+  <text class="d-tb" x="44" y="64">Quiescent session</text>
+  <text class="d-ts" x="44" y="84">idle &gt;1h · source adapter</text>
+
+  <rect class="d-box d-obs" x="250" y="40" width="170" height="64" rx="8"/>
+  <text class="d-tb" x="264" y="64">1 · Extract</text>
+  <text class="d-ts" x="264" y="84">mechanical · always runs</text>
+
+  <rect class="d-box d-jrnl" x="470" y="40" width="180" height="64" rx="8"/>
+  <text class="d-tb" x="484" y="64">Journal segment</text>
+  <text class="d-ts" x="484" y="84">staging → sync to root</text>
+
+  <rect class="d-box d-human" x="720" y="40" width="210" height="64" rx="8"/>
+  <text class="d-tmb" x="734" y="64">folk review</text>
+  <text class="d-ts" x="734" y="84">the human decides</text>
+
+  <!-- row 2 -->
+  <rect class="d-box d-interp" x="250" y="180" width="170" height="72" rx="8"/>
+  <text class="d-tb" x="264" y="204">2 · Promote</text>
+  <text class="d-ts" x="264" y="224">LLM · temperature 0</text>
+  <text class="d-ts" x="264" y="242">proposals, not appends</text>
+
+  <rect class="d-box" x="470" y="180" width="170" height="72" rx="8"/>
+  <text class="d-tb" x="484" y="204">3 · Lint</text>
+  <text class="d-ts" x="484" y="224">deterministic gate</text>
+  <text class="d-ts" x="484" y="242">quote · speaker · slugs</text>
+
+  <rect class="d-box d-danger" x="700" y="290" width="230" height="76" rx="8"/>
+  <text class="d-tb" x="714" y="314">Quarantine</text>
+  <text class="d-tm" x="714" y="334">~/.folk/quarantine/…</text>
+  <text class="d-ts" x="714" y="354">whole batch + lint report</text>
+
+  <!-- arrows -->
+  <line class="d-arrow" x1="210" y1="72" x2="245" y2="72" marker-end="url(#m7)"/>
+  <line class="d-arrow" x1="420" y1="72" x2="465" y2="72" marker-end="url(#m7)"/>
+  <text class="d-ts" x="426" y="62">obs</text>
+  <line class="d-arrow" x1="650" y1="72" x2="715" y2="72" marker-end="url(#m7)"/>
+  <text class="d-ts" x="654" y="62">queue</text>
+
+  <path class="d-arrow" d="M120,104 V216 H245" marker-end="url(#m7)"/>
+  <text class="d-ts" x="132" y="180">transcript</text>
+  <line class="d-arrow" x1="420" y1="216" x2="465" y2="216" marker-end="url(#m7)"/>
+
+  <path class="d-arrow" d="M555,180 V109" marker-end="url(#m7)"/>
+  <text class="d-ts" x="566" y="150">all clean →</text>
+  <text class="d-ts" x="566" y="166">append all</text>
+
+  <path class="d-arrow-danger" d="M640,230 H668 V328 H695" marker-end="url(#m7d)"/>
+  <text class="d-ts t-danger" x="600" y="278">any hard error →</text>
+  <text class="d-ts t-danger" x="600" y="294">nothing lands</text>
+
+  <path class="d-arrow" d="M860,290 V109" marker-end="url(#m7)"/>
+  <text class="d-ts" x="870" y="205">surfaces</text>
+  <text class="d-ts" x="870" y="221">for triage</text>
+
+  <!-- footnotes -->
+  <text class="d-ts" x="30" y="400">idempotent — promotion-state.json records each session once · capped per run · defers when Ollama is busy · one automatic</text>
+  <text class="d-ts" x="30" y="418">retry before quarantine · the extract step always runs, so the factual record is never held hostage by the LLM step</text>
+</svg>
+<figcaption><strong>The pipeline, with its two exits.</strong> The purple box is the only LLM in the entire system, and note what it lacks: an arrow to the journal. Only lint can append, and only all-or-nothing.</figcaption>
+</figure>
+
+<h2>Why the shape is exactly this</h2>
+<ul>
+  <li><strong>Extract runs first and always.</strong> The mechanical record — who participated, what was said, with <code>msg:</code> pointers — cannot fail on content, so it lands even when the LLM step doesn't. History is never held hostage by a model.</li>
+  <li><strong>The LLM writes proposals into a buffer, not events into the journal.</strong> Its output only becomes journal events after passing the full lint against the actual transcript: schema, verifiable quotes, speaker attribution, slug rules, duplicates.</li>
+  <li><strong>All-or-nothing appends.</strong> One hard lint error quarantines the session's <em>entire</em> promotion batch. A half-appended batch would be a record whose gaps are invisible; a quarantined batch is a visible object a human can triage in <code>folk review</code>.</li>
+  <li><strong>Soft findings flow, hard failures stop.</strong> A coined predicate with a definition, or a near-duplicate entity slug, is a <em>proposal</em> — it appends fine and queues for review. Only verifiable violations (a quote that isn't in the message, a subject who didn't speak it) are hard.</li>
+  <li><strong>Sources are pluggable.</strong> The first agent wired up is the first transcript source, not a structural requirement. An adapter's whole contract is: ordered, speaker-attributed messages with stable 0-based indices — that stability is what the entire <code>msg:</code> pointer system (and therefore quote verification) rests on.</li>
+</ul>
+
+<h2>The review queue: where durability is decided</h2>
+<p>The journal design lets agents write freely <em>because</em> nothing they write becomes authoritative without a human decision. That only works if pending decisions are visible and cheap to make — so everything that needs one queues in a single place:</p>
+
+<table>
+  <tr><th>Queue item</th><th>Accepting it means</th></tr>
+  <tr><td><strong>Vocab proposal</strong> — a coined predicate with its <code>p_def</code></td><td>The predicate enters <code>vocab.json</code> (which stays the vocabulary's single authority; the review event is the audit record).</td></tr>
+  <tr><td><strong>Bedrock suggestion</strong> — <code>level: bedrock</code> promotion</td><td>The fact enters the person file — diff shown, interactively confirmed, every time. The tool is a typist, not an author.</td></tr>
+  <tr><td><strong>Entity-resolution proposal</strong> — near-duplicate slugs</td><td>An alias lands in <code>vocab.json</code>; the next rebuild merges the slugs as a projection. The journal is untouched.</td></tr>
+  <tr><td><strong>Lint failure</strong> — a quarantined batch</td><td>Usually: inspect and discard. Occasionally: re-run promotion. Never: hand-edit the events into acceptability.</td></tr>
+</table>
+
+<p>Two properties make the queue trustworthy. It is <strong>derived, never stored</strong>: an item is pending iff it exists in the journal (or quarantine) and no <code>review</code> event resolves it — there is no queue file to corrupt or drift. And <strong>decisions are journal events</strong> (<code>kind: review</code>, <code>verdict</code>, <code>ref</code>), append-only like everything else, so the history of deciding is itself replayable.</p>
+
+<h2 id="containment">The containment boundary</h2>
+<p>Here is the uncomfortable fact the design takes seriously: memory-poisoning attacks (MINJA, arXiv:2503.03704) succeed through <em>ordinary conversation</em> — crafted text that really was said. The journal records it honestly, src lint passes honestly, and the trust tier is truthful about provenance while silent about manipulation. No amount of provenance machinery can catch a lie delivered in person.</p>
+
+<figure class="diagram" id="fig-containment">
+<svg viewBox="0 0 960 310" role="img" aria-label="Containment: injected conversation text is recorded honestly in the journal but must pass the human review gate before becoming a durable fact; external counterparty sessions are never batch-accepted">
+  <defs>
+    <marker id="m8" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--muted)"/>
+    </marker>
+  </defs>
+
+  <rect class="d-box d-danger" x="30" y="60" width="220" height="100" rx="10"/>
+  <text class="d-tb" x="46" y="88">Crafted text</text>
+  <text class="d-ts" x="46" y="110">in a real conversation —</text>
+  <text class="d-ts" x="46" y="128">query-only injection,</text>
+  <text class="d-ts" x="46" y="146">&gt;95% success in the wild</text>
+
+  <rect class="d-box d-jrnl" x="310" y="60" width="230" height="100" rx="10"/>
+  <text class="d-tb" x="326" y="88">Recorded honestly</text>
+  <text class="d-ts" x="326" y="110">it really was said: src lint</text>
+  <text class="d-ts" x="326" y="128">passes, tier is truthful about</text>
+  <text class="d-ts" x="326" y="146">provenance — not sincerity</text>
+
+  <!-- the gate -->
+  <rect x="608" y="30" width="12" height="230" rx="5" fill="var(--human)"/>
+  <text class="d-tb t-human" x="614" y="290" text-anchor="middle">folk review — the last line of defense</text>
+
+  <rect class="d-box" x="670" y="40" width="260" height="70" rx="10"/>
+  <text class="d-tb" x="686" y="66">Durable index fact</text>
+  <text class="d-ts" x="686" y="88">only via an explicit accept</text>
+
+  <rect class="d-box d-human" x="670" y="150" width="260" height="90" rx="10"/>
+  <text class="d-tb" x="686" y="176">Person file (Bedrock)</text>
+  <text class="d-ts" x="686" y="198">only via interactive accept —</text>
+  <text class="d-ts" x="686" y="216">exact diff shown, confirmed,</text>
+  <text class="d-ts" x="686" y="234">never batch, no exceptions</text>
+
+  <line class="d-arrow" x1="250" y1="110" x2="305" y2="110" marker-end="url(#m8)"/>
+  <line class="d-arrow" x1="540" y1="90" x2="603" y2="80" marker-end="url(#m8)"/>
+  <line class="d-arrow" x1="540" y1="130" x2="603" y2="180" marker-end="url(#m8)"/>
+  <line class="d-arrow" x1="620" y1="75" x2="665" y2="75" marker-end="url(#m8)"/>
+  <line class="d-arrow" x1="620" y1="190" x2="665" y2="190" marker-end="url(#m8)"/>
+</svg>
+<figcaption><strong>Poison can enter the journal; it cannot pass the gate unnoticed.</strong> The review queue is a security boundary, not a UX flourish — which is why sessions with an external <code>counterparty</code> get stricter defaults: surfaced individually, never batch-accepted.</figcaption>
+</figure>
+
+<p>This is why the <code>counterparty</code> field exists on session events, and why the rule attached to it is written as a security property: promotions from a session involving someone other than you are always reviewed one at a time. Batch flows are reserved for self-directed sessions, where the only person who could have poisoned the well is you.</p>
+
+<h2>Measured, not vibed</h2>
+<p>The promotion job's quality is the one place an LLM's judgment matters, so Phase 2 starts by making it measurable: the <a href="phases.html#eval">TRUSTMEM eval harness</a> scores promotion output against human-labeled references on coverage, faithfulness, and preservation — with no LLM judge anywhere in the scoring path. Until those numbers exist, "did the prompt change help?" is an anecdote; after, it's a diff against a recorded baseline.</p>
+
+<nav class="pagenav">
+  <a href="journal.html">← The journal</a>
+  <a href="domains.html">Domains &amp; loci →</a>
+</nav>
+
+</main>
+
+<footer>
+  <div class="footer-inner">
+    Concept documentation for the <strong>folk</strong> project · sources: <code>docs/design/session-promotion-job.md</code>, <code>docs/design/review-queue.md</code> · diagrams tracked in <code>docs/site/DIAGRAMS.md</code>
+  </div>
+</footer>
+
+</body>
+</html>

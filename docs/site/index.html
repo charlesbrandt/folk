@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>folk — concepts</title>
+<link rel="stylesheet" href="folk.css">
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <span class="nav-title">folk</span>
+    <a href="index.html" aria-current="page">Overview</a>
+    <a href="three-records.html">Three records</a>
+    <a href="trust.html">Trust tiers</a>
+    <a href="journal.html">The journal</a>
+    <a href="promotion.html">Promotion &amp; review</a>
+    <a href="domains.html">Domains &amp; loci</a>
+    <a href="phases.html">Phases &amp; roadmap</a>
+  </div>
+</header>
+
+<main class="wrap">
+
+<h1>folk — remember the people you know</h1>
+<p class="lede">folk is a UNIX-philosophy CLI for remembering people: real ones, colleagues, fictional characters, authors, musicians — and the connections between them. It is a memory substrate that agents write into and read from, without ever being trusted to decide what is true.</p>
+
+<p>The tool is small, but the conceptual load is real. Almost every design choice in folk falls out of a handful of ideas that repeat everywhere once you see them. This site exists to make those ideas visible.</p>
+
+<h2>The one-paragraph version</h2>
+<p>There are <strong>three records</strong>, each authoritative for exactly one thing: <em>person files</em> (markdown, git) hold what the human curated; the <em>journal</em> (append-only NDJSON) holds what happened; the <em>index</em> is a disposable cache derived from the other two by a deterministic rebuild. Agents and LLMs may <em>propose</em> facts, but every proposal passes a mechanical lint and queues for human review — nothing becomes durable without a person deciding. Trust is not a number anyone tunes; it is a <strong>tier derived at read time</strong> from who asserted a fact and how. And the whole thing is plain files: greppable, diffable, stdlib-only, no daemon, no lock-in.</p>
+
+<figure class="diagram" id="fig-system-map">
+<svg viewBox="0 0 960 545" role="img" aria-label="System map: conversation surfaces and source adapters write to the journal via the promotion pipeline; the human writes person files; a deterministic rebuild derives the index; read commands consume the index and person files">
+  <defs>
+    <marker id="m1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--muted)"/>
+    </marker>
+    <marker id="m1s" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--text)"/>
+    </marker>
+  </defs>
+
+  <!-- sources column -->
+  <rect class="d-box" x="20" y="50" width="190" height="64" rx="8"/>
+  <text class="d-tb" x="32" y="74">Conversation surfaces</text>
+  <text class="d-ts" x="32" y="94">chat agents · assistant UIs · …</text>
+
+  <rect class="d-box" x="20" y="150" width="190" height="64" rx="8"/>
+  <text class="d-tb" x="32" y="174">Source adapters</text>
+  <text class="d-ts" x="32" y="194">music library · photo archive · media server · …</text>
+
+  <rect class="d-box d-human" x="20" y="330" width="190" height="64" rx="8"/>
+  <text class="d-tb" x="32" y="354">The human</text>
+  <text class="d-ts" x="32" y="374">the only author of truth</text>
+
+  <!-- promotion pipeline -->
+  <rect class="d-box" x="255" y="46" width="170" height="84" rx="8"/>
+  <text class="d-tb" x="267" y="68">Promotion job</text>
+  <text class="d-ts" x="267" y="88">extract → LLM → lint</text>
+  <text class="d-ts t-interp" x="267" y="108">the only LLM in folk</text>
+
+  <!-- journal -->
+  <rect class="d-box d-jrnl" x="460" y="40" width="190" height="150" rx="8"/>
+  <text class="d-tb" x="472" y="66">The journal</text>
+  <text class="d-ts" x="472" y="86">what happened</text>
+  <text class="d-ts" x="472" y="104">append-only NDJSON</text>
+  <text class="d-ts" x="472" y="122">per-domain roots</text>
+  <text class="d-tm" x="472" y="148">session · observation</text>
+  <text class="d-tm" x="472" y="166">promotion · review</text>
+  <text class="d-tm" x="472" y="182">redaction</text>
+
+  <!-- person files -->
+  <rect class="d-box d-human" x="460" y="300" width="190" height="120" rx="8"/>
+  <text class="d-tb" x="472" y="326">Person files</text>
+  <text class="d-ts" x="472" y="346">what the human curated</text>
+  <text class="d-ts" x="472" y="364">markdown · git-tracked</text>
+  <text class="d-tm" x="472" y="390">s/sam/sam.md</text>
+  <text class="d-tm" x="472" y="408">## Associations · ## Voice</text>
+
+  <!-- rebuild -->
+  <rect class="d-box d-idx" x="710" y="170" width="180" height="56" rx="8"/>
+  <text class="d-tmb" x="722" y="194">folk index --rebuild</text>
+  <text class="d-ts" x="722" y="214">deterministic · no LLM</text>
+
+  <!-- index -->
+  <rect class="d-box d-idx" x="710" y="280" width="180" height="64" rx="8" stroke-dasharray="6 4"/>
+  <text class="d-tb" x="722" y="304">Triple index</text>
+  <text class="d-ts" x="722" y="324">derived cache — deletable</text>
+
+  <!-- readers -->
+  <rect class="d-box" x="700" y="400" width="200" height="60" rx="8"/>
+  <text class="d-tb" x="712" y="424">Read views</text>
+  <text class="d-tm" x="712" y="446">show · graph · surface</text>
+
+  <!-- render -->
+  <rect class="d-box" x="460" y="475" width="190" height="56" rx="8"/>
+  <text class="d-tmb" x="472" y="498">folk render</text>
+  <text class="d-ts" x="472" y="518">SOUL.md — Bedrock only</text>
+
+  <!-- arrows -->
+  <line class="d-arrow" x1="210" y1="82" x2="250" y2="86" marker-end="url(#m1)"/>
+  <line class="d-arrow" x1="425" y1="88" x2="455" y2="88" marker-end="url(#m1)"/>
+  <line class="d-arrow" x1="210" y1="182" x2="455" y2="162" marker-end="url(#m1)"/>
+  <text class="d-ts" x="290" y="188">observation events</text>
+  <line class="d-arrow-strong" x1="210" y1="362" x2="455" y2="360" marker-end="url(#m1s)"/>
+  <text class="d-ts" x="300" y="350">curates</text>
+  <line class="d-arrow" x1="555" y1="190" x2="555" y2="295" marker-end="url(#m1)"/>
+  <text class="d-ts" x="566" y="235">folk review —</text>
+  <text class="d-ts" x="566" y="253">accepted bedrock only</text>
+  <path class="d-arrow" d="M650,115 H678 V198 H704" marker-end="url(#m1)"/>
+  <path class="d-arrow" d="M650,360 H678 V212 H704" marker-end="url(#m1)"/>
+  <text class="d-ts" x="663" y="255">replay</text>
+  <line class="d-arrow" x1="800" y1="226" x2="800" y2="275" marker-end="url(#m1)"/>
+  <line class="d-arrow" x1="800" y1="344" x2="800" y2="395" marker-end="url(#m1)"/>
+  <line class="d-arrow" x1="555" y1="420" x2="555" y2="470" marker-end="url(#m1)"/>
+</svg>
+<figcaption><strong>The whole system on one screen.</strong> Writers are on the left, records in the middle, derived views on the right. Note the two paths into person files: the human directly, or the review queue — and nothing else. The index has a dashed border because deleting it loses nothing.</figcaption>
+</figure>
+
+<h2>Five ideas that explain everything else</h2>
+
+<div class="invariant">
+  <span class="tag">Idea 1 — one authority per record</span>
+  <p>Person files, journal, index: each is the single authority for one kind of truth. Nothing is ever authoritative in two places, so nothing can drift or conflict about what is real. <a href="three-records.html">Three records →</a></p>
+</div>
+
+<div class="invariant">
+  <span class="tag">Idea 2 — trust is derived, never stored</span>
+  <p>There are no confidence numbers anywhere. A fact's trust tier — <span class="chip human">curated</span> <span class="chip obs">observed</span> <span class="chip stated">stated</span> <span class="chip interp">interpreted</span> — is computed at read time from who wrote it and how. <a href="trust.html">Trust tiers →</a></p>
+</div>
+
+<div class="invariant">
+  <span class="tag">Idea 3 — the past is append-only</span>
+  <p>Journal segments are never edited. A wrong event is corrected by a <em>later</em> event; even canonicalization (slug aliases) is a projection applied at rebuild, with the journal untouched. One human-only exception exists, for privacy: redaction. <a href="journal.html">The journal →</a></p>
+</div>
+
+<div class="invariant">
+  <span class="tag">Idea 4 — LLM proposes, script disposes</span>
+  <p>Exactly one place in the whole system has an LLM: writing promotion <em>proposals</em>. Everything that decides — lint, rebuild, tier derivation, ranking — is a deterministic script. Run it twice, get byte-identical output. <a href="promotion.html">Promotion &amp; review →</a></p>
+</div>
+
+<div class="invariant">
+  <span class="tag">Idea 5 — domains never muddy each other</span>
+  <p>Real people, fictional characters, authors, musicians live in physically separate collections — config, never code. Cross-domain links are explicit graph edges (<code>appears_in</code>, <code>created_by</code>), not shared files. <a href="domains.html">Domains &amp; loci →</a></p>
+</div>
+
+<h2>Reading order</h2>
+<div class="cards">
+  <a class="card" href="three-records.html"><h3>Three records</h3><p>The storage model: person files, journal, index — and why the cache being disposable is the whole point.</p></a>
+  <a class="card" href="trust.html"><h3>Trust tiers</h3><p>How folk ranks what it knows without a single confidence number, and what "bedrock" means.</p></a>
+  <a class="card" href="journal.html"><h3>The journal</h3><p>Anatomy of an event, the five kinds, append-only correction, roots and per-writer segments.</p></a>
+  <a class="card" href="promotion.html"><h3>Promotion &amp; review</h3><p>How conversations become memory: extract → promote → lint → quarantine or queue — and the memory-poisoning containment boundary.</p></a>
+  <a class="card" href="domains.html"><h3>Domains &amp; loci</h3><p>Collections as domains, cross-domain edges, and Locus scoping: the barrier and the wormhole.</p></a>
+  <a class="card" href="phases.html"><h3>Phases &amp; roadmap</h3><p>Where the project is: tasks 1–6 shipped, the Archivist (eval, decay, surfacing) specced next.</p></a>
+</div>
+
+<h2>Philosophy, compressed</h2>
+<ul>
+  <li><strong>Agency:</strong> the system suggests, you decide. Only a human edits Bedrock.</li>
+  <li><strong>Files over databases:</strong> markdown and NDJSON — greppable, <code>jq</code>-able, git-trackable. No lock-in.</li>
+  <li><strong>Intentional curation, not algorithmic dumping:</strong> remembering someone is a choice, not a scrape.</li>
+  <li><strong>Perennial:</strong> Python stdlib only, zero daemons, zero dependencies. The tool should still run in twenty years.</li>
+</ul>
+
+</main>
+
+<footer>
+  <div class="footer-inner">
+    Concept documentation for the <strong>folk</strong> project · derived from <code>docs/design/*.md</code> and <code>CLAUDE.md</code> invariants · every diagram is tracked in <code>docs/site/DIAGRAMS.md</code>
+  </div>
+</footer>
+
+</body>
+</html>

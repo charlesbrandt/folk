@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Domains &amp; loci — folk concepts</title>
+<link rel="stylesheet" href="folk.css">
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <span class="nav-title">folk</span>
+    <a href="index.html">Overview</a>
+    <a href="three-records.html">Three records</a>
+    <a href="trust.html">Trust tiers</a>
+    <a href="journal.html">The journal</a>
+    <a href="promotion.html">Promotion &amp; review</a>
+    <a href="domains.html" aria-current="page">Domains &amp; loci</a>
+    <a href="phases.html">Phases &amp; roadmap</a>
+  </div>
+</header>
+
+<main class="wrap">
+
+<h1>Domains that never muddy each other</h1>
+<p class="lede">folk remembers real friends, fictional characters, authors, and musicians — and prevents those worlds from blurring together. Collections are physically separate directory trees, logically separate domains, and connected only by edges a human meant to draw.</p>
+
+<h2>Collections are config, never code</h2>
+<p>No collection name appears anywhere in folk's source. Adding a domain is one line in <code>~/.config/folk/collections</code>:</p>
+<pre><code>{"personal":   "~/people/personal",
+ "characters": "~/notes/fiction/characters",
+ "authors":    "~/notes/books/authors",
+ "musicians":  "~/notes/music/people"}</code></pre>
+<p>This is invariant 7, and it is stronger than a style rule: the architecture <em>depends</em> on new domains (and later, loci) being config changes. Anything that enumerates a collection name in a <code>.py</code> file has taken a wrong turn — journal roots and loci roots are registered the same way, never hardcoded.</p>
+
+<figure class="diagram" id="fig-domain-islands">
+<svg viewBox="0 0 960 390" role="img" aria-label="Three collection islands — personal, characters, authors — with cross-domain edges appears_in and created_by meeting at a work entity">
+  <defs>
+    <marker id="m9" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--muted)"/>
+    </marker>
+  </defs>
+
+  <!-- personal island -->
+  <rect class="d-ghost" x="30" y="40" width="230" height="150" rx="12"/>
+  <text class="d-tb" x="46" y="66">personal</text>
+  <text class="d-ts" x="46" y="84">real people</text>
+  <rect class="d-box d-human" x="56" y="110" width="180" height="40" rx="8"/>
+  <text class="d-tm" x="70" y="135">person:sam</text>
+
+  <!-- characters island -->
+  <rect class="d-ghost" x="300" y="40" width="280" height="300" rx="12"/>
+  <text class="d-tb" x="316" y="66">characters</text>
+  <text class="d-ts" x="316" y="84">fictional — separate, always</text>
+  <rect class="d-box" x="330" y="104" width="200" height="40" rx="8"/>
+  <text class="d-tm" x="344" y="129">person:toru-watanabe</text>
+  <rect class="d-box" x="330" y="174" width="200" height="40" rx="8"/>
+  <text class="d-tm" x="344" y="199">person:naoko</text>
+  <rect class="d-box" x="330" y="244" width="200" height="40" rx="8"/>
+  <text class="d-tm" x="344" y="269">person:sheep-man</text>
+
+  <!-- work node -->
+  <rect class="d-box d-stated" x="650" y="130" width="250" height="40" rx="8"/>
+  <text class="d-tm" x="664" y="155">work:norwegian-wood</text>
+
+  <!-- authors island -->
+  <rect class="d-ghost" x="640" y="230" width="290" height="120" rx="12"/>
+  <text class="d-tb" x="656" y="256">authors</text>
+  <rect class="d-box" x="666" y="276" width="230" height="40" rx="8"/>
+  <text class="d-tm" x="680" y="301">person:haruki-murakami</text>
+
+  <!-- edges -->
+  <line class="d-arrow" x1="530" y1="124" x2="645" y2="144" marker-end="url(#m9)"/>
+  <text class="d-tm" x="546" y="118">appears_in</text>
+  <line class="d-arrow" x1="530" y1="194" x2="645" y2="160" marker-end="url(#m9)"/>
+  <line class="d-arrow" x1="775" y1="170" x2="780" y2="271" marker-end="url(#m9)"/>
+  <text class="d-tm" x="790" y="220">created_by</text>
+
+  <!-- notes -->
+  <text class="d-ts" x="30" y="230">no edge unless a human drew one —</text>
+  <text class="d-ts" x="30" y="248">real and fictional never share a file</text>
+  <text class="d-t" x="300" y="372"><tspan class="d-tb">cross-domain by predicate, not by schema:</tspan> the boundary holds, the links are explicit</text>
+</svg>
+<figcaption><strong>Islands with bridges.</strong> Each dashed region is a separate directory tree with its own journal root. Characters reach their author only through <code>work:</code> entities and curated edges — queries scope to the active collection by default, and cross-domain edges render when either endpoint is in scope.</figcaption>
+</figure>
+
+<h2>Identity across collections</h2>
+<p>Collections are <em>memberships</em>, not identities. An author who is also a musician gets one canonical person file and a symlink from the second collection — never two files that could drift. Before any adapter mints a new <code>person:</code> slug, it can ask <code>folk lookup "&lt;name&gt;" --json</code>, which checks every collection and answers: exact match (reuse silently), near-matches (never auto-merge — flag for a human), or genuinely new.</p>
+
+<h2 id="loci">Loci: places with personalities</h2>
+<p>A <strong>Locus</strong> is a narrative place — a writing room, a Murakami-flavored world — built from two existing mechanics composed, with no new machinery: a person-like markdown file (its <code>## Genius Loci</code> section holds mood, rules, personality) and a scope tag (<code>locus</code>) carried on journal events. Scenes are just conversations whose events carry the tag — stamped <em>mechanically by the source adapter</em>, never guessed by the promotion LLM, because scoping is a trust decision and trust decisions stay deterministic.</p>
+
+<figure class="diagram" id="fig-locus-barrier">
+<svg viewBox="0 0 960 400" role="img" aria-label="A locus with its curated cast and locus-tagged scenes; an outside person can enter ephemerally via a tagged scene or durably via a curated guest_of edge; their home profile is unchanged either way">
+  <defs>
+    <marker id="m10" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--muted)"/>
+    </marker>
+    <marker id="m10h" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--human)"/>
+    </marker>
+  </defs>
+
+  <!-- locus -->
+  <rect class="d-box d-jrnl" x="380" y="40" width="310" height="280" rx="14"/>
+  <text class="d-tmb" x="398" y="70">locus:murakami-world</text>
+  <text class="d-ts" x="398" y="92">## Genius Loci — mood, rules, voice</text>
+  <text class="d-ts" x="398" y="110">home domain: characters</text>
+  <rect class="d-box d-human" x="398" y="130" width="274" height="76" rx="8"/>
+  <text class="d-tb" x="410" y="152">Cast — curated, Bedrock</text>
+  <text class="d-tm" x="410" y="174">toru-watanabe · appears_in</text>
+  <text class="d-tm" x="410" y="192">reiko-ishida · appears_in</text>
+  <rect class="d-box" x="398" y="222" width="274" height="76" rx="8"/>
+  <text class="d-tb" x="410" y="244">Scenes — journal, tagged</text>
+  <text class="d-tm" x="410" y="266">conv:20260701… locus:…</text>
+  <text class="d-tm" x="410" y="284">conv:20260718… locus:…</text>
+
+  <!-- guest -->
+  <rect class="d-box" x="40" y="60" width="230" height="56" rx="8"/>
+  <text class="d-tm" x="54" y="84">person:sam</text>
+  <text class="d-ts" x="54" y="104">home: personal</text>
+
+  <path class="d-arrow-dash" d="M270,80 C330,80 340,110 375,130" marker-end="url(#m10)"/>
+  <text class="d-ts" x="120" y="150">ephemeral tunnel — one Scene's events</text>
+  <text class="d-ts" x="120" y="168">carry the locus tag; visible in drill-down,</text>
+  <text class="d-ts" x="120" y="186">absent from the cast list; no standing trace</text>
+
+  <path d="M155,116 C155,240 260,262 375,262" class="d-arrow-strong" style="stroke: var(--human)" marker-end="url(#m10h)"/>
+  <text class="d-ts t-human" x="120" y="300">durable wormhole — a human curates</text>
+  <text class="d-tm t-human" x="120" y="320">guest_of</text>
+  <text class="d-ts t-human" x="195" y="320">into a file → cast member</text>
+
+  <!-- barrier note -->
+  <rect class="d-ghost" x="380" y="332" width="540" height="58" rx="10" style="stroke: var(--human)"/>
+  <text class="d-t" x="398" y="356"><tspan class="d-tb">the barrier:</tspan> folk show person:sam is byte-for-byte</text>
+  <text class="d-t" x="398" y="378">unchanged by any guest appearance elsewhere</text>
+</svg>
+<figcaption><strong>The barrier and the wormhole.</strong> Crossing a domain boundary once is free and leaves no trace beyond the Scene; crossing it as a standing thing is a deliberate, human, file-level decision. The same ephemeral/durable split as every other tier boundary in folk.</figcaption>
+</figure>
+
+<h2>The four locus decisions, compressed</h2>
+<ul>
+  <li><strong>Default barrier, explicit wormhole.</strong> Locus-scoped views admit only locus-tagged events and curated associations — and a person's own default profile is never widened by guest appearances elsewhere. The barrier is enforced on the Locus side.</li>
+  <li><strong>Locus tags are declared, never inferred.</strong> The surface (an agent's profile bound to a Locus, a chat UI's folder) stamps the tag mechanically. A mislabeled locus would be a scoping error, and scoping errors must stay in the deterministic part of the pipeline.</li>
+  <li><strong>Authority splits along the three-records line.</strong> The Locus file curates cast and pillar scenes (Bedrock); journal events carry what happened there; the index derives the union at rebuild. Same invariant, same guarantee as people.</li>
+  <li><strong>Locus files live with their domain.</strong> Per-collection <code>loci/</code> subdirectories (or explicit registration in <code>~/.config/folk/loci-roots</code>) — a Murakami Locus sits next to <code>characters</code>, a life-planning Locus next to <code>personal</code>. Registration requires zero code changes.</li>
+</ul>
+
+<nav class="pagenav">
+  <a href="promotion.html">← Promotion &amp; review</a>
+  <a href="phases.html">Phases &amp; roadmap →</a>
+</nav>
+
+</main>
+
+<footer>
+  <div class="footer-inner">
+    Concept documentation for the <strong>folk</strong> project · sources: <code>docs/design/collections-and-graph.md</code>, <code>docs/design/loci.md</code> · diagrams tracked in <code>docs/site/DIAGRAMS.md</code>
+  </div>
+</footer>
+
+</body>
+</html>

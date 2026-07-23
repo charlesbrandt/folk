@@ -1,0 +1,17 @@
+{
+  "_note": "Synthetic regression fixture -- see meta.json and NOTE.md. Coverage matching is (s, p, o) only, evidence-agnostic (promotion-eval.md Decision 2): the bakes_daily/event fact is a real, valuable fact regardless of which evidence tier it's recorded at, so it lives in reference. The known_false entry pins evidence=\"stated\" specifically -- that combination (subject=person:elena, evidence=stated) asserts Elena spoke in this conversation, which is false; the same triple at evidence=\"interpreted\" is the correct, reference-listed encoding. This is exactly the third-party-testimony bug the 2026-07-19 prompt fix (folk/promotion.py, commit 5c64b0e) targets, and it's also independently caught by src-lint's speaker-attribution check (faithfulness.src_lint in the report) -- the two mechanisms deliberately overlap here.",
+  "reference": [
+    {"s": "person:sam", "p": "associated", "o": "person:elena", "evidence": "stated", "level": "core"},
+    {"s": "person:elena", "p": "bakes_daily", "o": "event:daily-bread-baking", "evidence": "interpreted", "level": "core"},
+    {"s": "person:sam", "p": "interested_in", "o": "topic:family-history", "evidence": "interpreted", "level": "core"},
+    {"s": "person:elena", "p": "values", "o": "value:ritual-as-relief", "evidence": "interpreted", "level": "bedrock"},
+    {"s": "person:sam", "p": "motivated_by", "o": "value:family-continuity", "evidence": "interpreted", "level": "bedrock"},
+    {"s": "agent:eval-hermes", "p": "assessed_most_meaningful", "o": "moment:elena-bread-ritual", "evidence": "interpreted", "level": "core"},
+    {"s": "person:sam", "p": "tagged", "o": "tag:family", "evidence": "interpreted", "level": "core"}
+  ],
+  "acceptable_extras": [],
+  "known_false": [
+    {"s": "person:elena", "p": "bakes_daily", "o": "event:daily-bread-baking", "evidence": "stated",
+     "_why": "asserts Elena directly stated this in the conversation -- she never spoke; person:sam did, about her (third-party testimony)."}
+  ]
+}

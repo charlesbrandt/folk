@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trust tiers — folk concepts</title>
+<link rel="stylesheet" href="folk.css">
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <span class="nav-title">folk</span>
+    <a href="index.html">Overview</a>
+    <a href="three-records.html">Three records</a>
+    <a href="trust.html" aria-current="page">Trust tiers</a>
+    <a href="journal.html">The journal</a>
+    <a href="promotion.html">Promotion &amp; review</a>
+    <a href="domains.html">Domains &amp; loci</a>
+    <a href="phases.html">Phases &amp; roadmap</a>
+  </div>
+</header>
+
+<main class="wrap">
+
+<h1>Trust is derived, never stored</h1>
+<p class="lede">folk has no confidence scores. A fact's trustworthiness is a <strong>tier</strong>, computed at read time from three things the journal already records honestly: who asserted it (<code>actor</code>), what kind of event asserted it (<code>kind</code>), and what backs it (<code>evidence</code>). There is nothing to tune, so there is nothing to drift.</p>
+
+<figure class="diagram" id="fig-tier-ladder">
+<svg viewBox="0 0 960 440" role="img" aria-label="The trust ladder: curated above observed above stated above interpreted, with bedrock suggestions floating outside the ladder and feeding the top via review">
+  <defs>
+    <marker id="m4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--muted)"/>
+    </marker>
+  </defs>
+
+  <!-- axis -->
+  <line class="d-arrow" x1="34" y1="330" x2="34" y2="50" marker-end="url(#m4)"/>
+  <text class="d-ts" x="18" y="196" transform="rotate(-90 18 196)" text-anchor="middle">more trust</text>
+
+  <!-- tiers -->
+  <rect class="d-box d-human" x="60" y="40" width="560" height="60" rx="8"/>
+  <text class="d-tb" x="76" y="65">1 · curated <tspan class="d-ts">(human)</tspan></text>
+  <text class="d-ts" x="76" y="86">you wrote it, in a person file — Bedrock</text>
+
+  <rect class="d-box d-obs" x="60" y="116" width="560" height="60" rx="8"/>
+  <text class="d-tb" x="76" y="141">2 · observed</text>
+  <text class="d-ts" x="76" y="162">mechanical record by a deterministic, versioned tool — no LLM anywhere in its path</text>
+
+  <rect class="d-box d-stated" x="60" y="192" width="560" height="60" rx="8"/>
+  <text class="d-tb" x="76" y="217">3 · stated</text>
+  <text class="d-ts" x="76" y="238">said directly — verbatim quote, lint-verified src pointer back to the message</text>
+
+  <rect class="d-box d-interp" x="60" y="268" width="560" height="60" rx="8"/>
+  <text class="d-tb" x="76" y="293">4 · interpreted</text>
+  <text class="d-ts" x="76" y="314">an agent's reading of the conversation — audit it via the src pointer</text>
+
+  <!-- bedrock floater -->
+  <rect class="d-ghost" x="680" y="150" width="250" height="140" rx="10" style="stroke: var(--human)"/>
+  <text class="d-tb t-human" x="696" y="178">bedrock suggestions</text>
+  <text class="d-ts" x="696" y="202">outside the ladder entirely:</text>
+  <text class="d-ts" x="696" y="220">a proposal, never indexed as fact.</text>
+  <text class="d-ts" x="696" y="244">Queues in folk review; accepted,</text>
+  <text class="d-ts" x="696" y="262">it enters the person file —</text>
+  <text class="d-ts" x="696" y="280">and becomes tier 1 the human way.</text>
+  <path class="d-arrow-dash" d="M805,150 C805,90 700,70 625,70" marker-end="url(#m4)" style="stroke: var(--human)"/>
+  <text class="d-ts t-human" x="760" y="112">accept, via review</text>
+
+  <!-- no conf -->
+  <text class="d-tm" x="76" y="386">conf: 0.87</text>
+  <line x1="70" y1="381" x2="160" y2="381" stroke="var(--danger)" stroke-width="2"/>
+  <text class="d-t" x="180" y="386">no numbers, anywhere — <tspan class="d-tb">tier = f(actor, kind, evidence)</tspan>, computed when you read</text>
+</svg>
+<figcaption><strong>The ladder and the floater.</strong> Four tiers in strict order, and one thing deliberately outside the order: <code>level: bedrock</code> promotions, which are never facts at all until a human accepts them into a person file.</figcaption>
+</figure>
+
+<h2>The four tiers, precisely</h2>
+<table>
+  <tr><th>Tier</th><th>Comes from</th><th>What earns it</th></tr>
+  <tr>
+    <td><span class="chip human">curated</span></td>
+    <td>Person files</td>
+    <td>A human wrote it. The top tier is not "very confident" — it is a different <em>kind</em> of thing: a judgment, not a measurement.</td>
+  </tr>
+  <tr>
+    <td><span class="chip obs">observed</span></td>
+    <td><code>kind: observation</code>, mechanical actor (<code>extract:v1</code>, <code>import:media-library:v1</code>)</td>
+    <td>Determinism. A mechanical actor is a versioned tool with no LLM anywhere in its path — that property, not accuracy claims, is what earns the tier. Anything with an LLM in the loop must write as <code>agent:&lt;name&gt;</code> instead.</td>
+  </tr>
+  <tr>
+    <td><span class="chip stated">stated</span></td>
+    <td><code>kind: promotion</code>, <code>evidence: stated</code></td>
+    <td>A verbatim quote plus a <code>msg:</code> pointer, and lint <em>proves</em> both: the quote must appear in the cited message (5-word shingle match) and the fact's subject must be that message's speaker. Testimony about a third party doesn't qualify — reframe with the speaker as subject, or demote to interpreted.</td>
+  </tr>
+  <tr>
+    <td><span class="chip interp">interpreted</span></td>
+    <td><code>kind: promotion</code>, <code>evidence: interpreted</code></td>
+    <td>An inference. Honest about being one: the <code>note</code> is a summary, and the <code>src</code> pointer is the audit trail to what it was inferred from.</td>
+  </tr>
+</table>
+
+<h2>Why no numbers?</h2>
+<p>Confidence scores look rigorous and behave badly. Someone has to pick them; nobody can audit them; they silently encode one model's calibration at one moment; and every downstream consumer starts thresholding against them, which turns an arbitrary number into load-bearing infrastructure. folk's alternative is categorical and honest: the tier tells you <em>what kind of backing</em> a fact has, and the <code>src</code> pointer lets you check the backing yourself. A quote either appears in the message or it doesn't. A tool either has an LLM in its path or it doesn't.</p>
+
+<div class="invariant">
+  <span class="tag">Invariant 5</span>
+  <p>No <code>conf</code> numbers. Trust is a tier derived at read time from <code>actor</code> + <code>kind</code> + <code>evidence</code>. Bedrock-level facts are only ever suggestions — only the human edits Bedrock.</p>
+</div>
+
+<h2>Bedrock: identity is not a fact level, it's an ownership level</h2>
+<p>Promotions carry a <code>level</code>: <code>core</code> for ordinary durable facts, <code>bedrock</code> for identity-level claims ("this is a defining moment", "this is who they are"). The asymmetry is total: a lint-clean <code>core</code> promotion lands in the index at its evidence tier and is immediately queryable; a <code>bedrock</code> promotion <em>never</em> becomes an index fact, no matter how clean. Replay surfaces it as a suggestion, <code>folk review</code> presents it, and if the human accepts, the fact enters the person file — the only authority for Bedrock — with the exact diff shown first. Machines can notice who someone might be; only a person decides.</p>
+
+<h2>Derived-at-read-time has teeth</h2>
+<p>Because the tier is a projection, not a stored value, several things follow for free:</p>
+<ul>
+  <li><strong>Retroactive correctness.</strong> If a tier rule is refined (as the subject-must-be-speaker rule was), the next rebuild reclassifies history correctly. No backfill migration, no stale scores.</li>
+  <li><strong>The tier can't be forged separately from the evidence.</strong> There is no field to set — to claim <code>stated</code>, an event must carry a quote that survives shingle verification. The tier is a <em>consequence</em>.</li>
+  <li><strong>Downstream ranking stays deterministic.</strong> <code>folk show</code> groups its profile by tier; <a href="phases.html#surface">surfacing</a> uses the tier order as one of its four rankers. Nothing anywhere needs a threshold.</li>
+</ul>
+
+<p>One honest limitation, by design: the tier speaks about <em>provenance</em>, not sincerity. A manipulative statement in a real conversation is still genuinely <code>stated</code> — the containment for that lives in the <a href="promotion.html#containment">review boundary</a>, not in the tier system.</p>
+
+<nav class="pagenav">
+  <a href="three-records.html">← Three records</a>
+  <a href="journal.html">The journal →</a>
+</nav>
+
+</main>
+
+<footer>
+  <div class="footer-inner">
+    Concept documentation for the <strong>folk</strong> project · sources: <code>docs/design/journal-schema.md</code> ("Trust tiers"), <code>README.md</code> · diagrams tracked in <code>docs/site/DIAGRAMS.md</code>
+  </div>
+</footer>
+
+</body>
+</html>

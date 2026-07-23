@@ -1,0 +1,9 @@
+{
+  "_note": "Authored for the eval harness -- NOT the real 2026-07-19 live-test session. That session's transcript and model outputs were never saved to disk (only described in prose in docs/HANDOFF.md's task-4 section); this is a fresh, clearly-synthetic fixture built to exercise the same bug class (third-party testimony about a family member misattributed as the third party's own direct statement) that the 2026-07-19 run surfaced and folk/promotion.py's prompt fix (commit 5c64b0e) addresses. See NOTE.md in this directory.",
+  "session_id": "synthetic-family-testimony",
+  "conv": "conv:synthetic-family-testimony",
+  "user_slug": "person:sam",
+  "agent_slug": "agent:eval-hermes",
+  "collection": "personal",
+  "transcript": "transcript.jsonl"
+}

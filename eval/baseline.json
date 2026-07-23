@@ -1,0 +1,29 @@
+{
+  "aggregate": {
+    "coverage": 0.75,
+    "faithfulness": 1.0,
+    "src_lint": 1.0
+  },
+  "sessions": {
+    "20260601_025800_7f3ac9e2": {
+      "coverage": {
+        "ratio": 0.5
+      },
+      "faithfulness": {
+        "ratio": 1.0
+      },
+      "src_lint": null
+    },
+    "synthetic-family-testimony": {
+      "coverage": {
+        "ratio": 1.0
+      },
+      "faithfulness": {
+        "ratio": 1.0
+      },
+      "src_lint": {
+        "pass_rate": 1.0
+      }
+    }
+  }
+}
