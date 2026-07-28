@@ -1,0 +1,54 @@
+# Run from web/: docker compose up --build
+#
+# api's build context is the repo root (`..`) so the image can install
+# folk-the-library alongside this subtree's own dependencies -- see
+# Dockerfile's header comment. The volume mounts below are host-specific:
+# they bind-mount this machine's folk config/index and the trees where your
+# collections actually live, at identical absolute paths, because folk's
+# config.py resolves paths via Path.home() and collections.json stores
+# absolute host paths -- adjust these to match your own
+# ~/.config/folk/collections before running against a different machine's
+# data. The seeded characters/authors collections (README.md's
+# zero-personal-data proof path) can live anywhere on your host; just mount
+# whatever directory holds them alongside the config/index mounts below.
+services:
+  api:
+    build:
+      context: ..
+      dockerfile: web/Dockerfile
+    ports:
+      - "8500:8000"
+    environment:
+      - HOME=/home/folkuser
+    volumes:
+      - ${HOME}/.config/folk:/home/folkuser/.config/folk:ro
+      - ${HOME}/.folk:/home/folkuser/.folk:ro
+      - ${HOME}/people:/home/folkuser/people:ro
+    command: uvicorn api:app --host 0.0.0.0 --port 8000 --reload
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/status')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  ui:
+    build: ./ui
+    ports:
+      - "5175:5175"
+    volumes:
+      - ./ui:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - VITE_API_TARGET=http://api:8000
+    depends_on:
+      - api
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:5175', r => process.exit(r.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
