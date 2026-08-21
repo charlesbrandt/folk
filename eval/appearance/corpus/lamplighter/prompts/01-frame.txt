@@ -1,0 +1,4 @@
+setting: a narrow street at dusk, wet cobbles, the shopfronts already dark
+figure: build: narrow, stooped from years of reaching upward; hair: cropped close, gone entirely grey at the temples; face: long, deeply lined around the eyes from squinting at flame; dress: a canvas coat past the knee, oil-stained at the cuffs; distinguishing marks: a burn scar across the back of the right hand; Carries the pole always, even when there is nothing to light.
+camera: wide, static, slightly below eye level
+lighting: one lit lamp behind the figure, everything else falling away

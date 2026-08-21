@@ -1,0 +1,20 @@
+{
+  "_note": "Hand-authored labels for the lamplighter fixture (appearance.md Decision 10). Nothing here is computed, and nothing computes a metric from `likeness_grades` -- they are a human's judgment, recorded against the exact brief that produced the render, and the harness's only job is to keep them attributable and to report them alongside the deterministic checks. See NOTE.md.",
+  "expected_stale_prompts": [
+    "02-stale-frame.txt"
+  ],
+  "likeness_grades": [
+    {
+      "render": "renders/lamplighter-01-a.png",
+      "brief_fingerprint": "0d3cdb7edea8",
+      "grade": "match",
+      "note": "Coat and pole read correctly; the burn scar is not visible at this distance, which is fine for a wide shot."
+    },
+    {
+      "render": "renders/lamplighter-01-b.png",
+      "brief_fingerprint": "0d3cdb7edea8",
+      "grade": "drift",
+      "note": "Read as a much younger figure than 'gone entirely grey at the temples' asks for -- the brief is being outvoted by the model's default, not misread. Candidate for a negative hint on the project side, which is rendering-only and does not belong in folk."
+    }
+  ]
+}

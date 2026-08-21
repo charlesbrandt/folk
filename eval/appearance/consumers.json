@@ -1,0 +1,9 @@
+{
+  "_note": "Which labels a consumer actually reads, for the coverage check (appearance.md Decision 10). Committed config, frozen like eval/vocab.json -- deliberately NOT a lookup into a live consumer's configuration, so a coverage number is reproducible across machines and time. This file is the one place in the repo where label names are written down, and it is config, never code: folk's own source contains no label name anywhere (Decision 2).",
+  "consumers": {
+    "dream": {
+      "description": "The dream toolkit's figure: clause. It reads the flattened brief today; these are the labels a figure needs for that clause to hold a person together across frames.",
+      "required_labels": ["build", "hair", "face"]
+    }
+  }
+}
