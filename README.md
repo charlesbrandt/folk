@@ -105,3 +105,7 @@ Key decisions:
 - **Files over databases**: person files are plain markdown, journal segments and the triple index are NDJSON (greppable, `jq`-compatible). No lock-in.
 - **No media duplication**: reference photos/videos in Immich, Plex, or local paths. `folk media` queries them at recall time.
 - **Perennial**: Python stdlib only, zero daemon dependencies, git-trackable.
+
+## Development history
+
+This repo's public history is a curated export from a longer private development history, grouped into milestone commits rather than replaying every incremental change — done deliberately before the first public push, to keep personal test data and infrastructure details that accumulate during private day-to-day use out of what ships here. `scripts/check_release_hygiene.py` is the checker that enforces this going forward for anyone contributing.
