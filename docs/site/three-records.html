@@ -71,7 +71,7 @@
   <text class="d-tb" x="676" y="146">The triple index</text>
   <text class="d-t" x="676" y="172">authority for:</text>
   <text class="d-tb t-idx" x="676" y="192">nothing — a derived cache</text>
-  <text class="d-ts" x="676" y="220">NDJSON, the only thing</text>
+  <text class="d-ts" x="676" y="220">NDJSON, host-local cache at</text>
   <text class="d-tm" x="676" y="244">~/.folk/triples.ndjson</text>
   <text class="d-ts" x="676" y="270">deletable at any time;</text>
   <text class="d-ts" x="676" y="288">rebuild restores it exactly</text>
@@ -82,7 +82,7 @@
   <text class="d-ts" x="480" y="395" text-anchor="middle">both replayed deterministically into the index at rebuild</text>
   <path class="d-arrow" d="M345,330 C420,368 560,368 655,336" fill="none" opacity="0"/>
 </svg>
-<figcaption><strong>One authority each.</strong> The gold record is human-owned, the teal record is history, the slate record is a cache. The dashed border is the point: if the index disagrees with the other two, the index is wrong by definition — delete it and rebuild.</figcaption>
+<figcaption><strong>One authority each.</strong> The gold record is human-owned, the teal record is history, the slate record is a cache. The dashed border is the point: if the index disagrees with the other two, the index is wrong by definition — delete it and rebuild. Nothing under <code>~/.folk/</code> is authoritative: the review quarantine, the promotion state file and log, and the sibling <code>~/.folk-staging/</code> share that space, but they are host-local operational state, not a fourth record.</figcaption>
 </figure>
 
 <h2>Why a disposable cache is a feature</h2>

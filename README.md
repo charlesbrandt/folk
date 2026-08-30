@@ -55,7 +55,7 @@ Three records, one authority each — never make anything authoritative in two p
 |-------|-----------|--------|----------|
 | Person files | What the human curated | Markdown, git-tracked | Collection dir (`{collection}/{initial}/{slug}/{slug}.md`) |
 | Journal | What happened | Append-only NDJSON segments, never edited | Registered per-collection journal roots (`{collection-dir}/journal/YYYY-MM.{writer}.ndjson`) — no single global journal directory |
-| Triple index | Derived cache | NDJSON | `~/.folk/triples.ndjson` — the only thing under `~/.folk/`, deletable and rebuildable at any time |
+| Triple index | Derived cache | NDJSON | `~/.folk/triples.ndjson` — deletable and rebuildable at any time. Nothing under `~/.folk/` is authoritative: the review quarantine, the promotion state file and log, and the sibling `~/.folk-staging/` also live there, but they are host-local operational state, not a fourth record |
 
 `folk index --rebuild` is the only thing that ever writes the index: it parses person files (human tier) and replays every journal segment (observed/stated/interpreted tiers, plus `bedrock` suggestions awaiting a human decision), deterministically. Run twice, byte-identical output — there is no LLM anywhere in this path.
 
