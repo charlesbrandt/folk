@@ -15,7 +15,7 @@ One event per line, NDJSON, in per-writer monthly segments `YYYY-MM.<writer>.ndj
 | `kind` | enum | yes | `session` \| `observation` \| `promotion` \| `review` \| `redaction`. See per-kind rules below. |
 | `evidence` | enum | promotions only | `stated` (said directly — `note` must contain the verbatim quote) \| `interpreted` (a reading of the conversation). |
 | `level` | enum | promotions only | `core` (ordinary durable fact) \| `bedrock` (identity-level — only ever a suggestion to the human, never indexed as fact). |
-| `s`, `p`, `o` | strings | session/observation/promotion | Subject, predicate, object. Slugs are lowercase ascii, hyphen-separated, type-prefixed (`person:charles`, `topic:x`); predicates come from `vocab.json` or carry `p_def`. |
+| `s`, `p`, `o` | strings | session/observation/promotion | Subject, predicate, object. Slugs are lowercase ascii, hyphen-separated, type-prefixed (`person:sam`, `topic:x`); predicates come from `vocab.json` or carry `p_def`. |
 | `p_def` | string | when coining | One-line definition attached when the predicate is not in `vocab.json`. Lint files coined predicates as proposals for `folk review`, not errors. |
 | `src` | string | stated promotions; recommended for interpreted; required for source-adapter events | Pointer to the event's source. Conversation sources: `msg:<session-id>#<index>` (0-based index into the transcript's user/assistant messages). Source adapters: an adapter-namespaced row pointer (e.g. `digger:play:12345`). For `stated`, the pointer must be a `msg:` pointer and lint verifies the quote appears in that message (5-word shingle) and that the fact's subject is the message's speaker — shingle verification applies to `msg:` pointers only. |
 | `session` | string | conversation-source session/observation/promotion | `conv:<session-id>` — the conversation this event came from. Drill-down path from an index triple back to what was actually said. Absent on source-adapter events, which have no conversation (see "Source adapters" below). |
@@ -55,7 +55,7 @@ Readers (replay, lint, review tooling) MUST ignore unknown fields and tolerate a
 ## Divergences from the prototype (intentional)
 
 - Prototype events have no `id`; folk-proper events must. A one-shot migration script may add `id` to the prototype segments (permitted only because they are pre-production).
-- Prototype segments are per-month only (`2026-05-observations.ndjson`); folk-proper segments are per-month **per-writer** (`2026-05.apu.ndjson`) so multiple machines never append to the same file.
+- Prototype segments are per-month only (`2026-05-observations.ndjson`); folk-proper segments are per-month **per-writer** (`2026-05.desktop.ndjson`) so multiple machines never append to the same file.
 - `kind: review`, `locus`, and `p_def` are additions this schema introduces; the prototype predates them.
 - `v`, `counterparty`, and `kind: redaction` added 2026-07-19 (an earlier critical-review pass over the wider persona-agent architecture design); the prototype predates them too. Still `v: 1` — these are the first version's shape, not a bump, since no folk-proper events exist yet.
 - Source-adapter generalization added 2026-07-19 (digger community-layer reconciliation): `session` scoped to conversation sources, `src` generalized to adapter-namespaced pointers, mechanical-actor definition tightened, duplicate-triple lint scoped to promotions. Also still `v: 1`, same reasoning.

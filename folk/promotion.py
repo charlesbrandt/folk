@@ -205,7 +205,7 @@ def promote(session, vocab, known_object_slugs, model, ollama_url, call=None):
 # --------------------------------------------------------- per-session flow --
 
 def process_session(session, vocab, index_path, staging_root, quarantine_dir,
-                     model, ollama_url, writer="apu", promote_call=None, max_attempts=2):
+                     model, ollama_url, writer="host", promote_call=None, max_attempts=2):
     """Extract, promote, lint, append-or-quarantine for one session. Returns
     (outcome, counts, wall_seconds, errors). outcome is "ok", "quarantined",
     or "deferred" (Ollama unreachable/busy -- session-promotion-job.md

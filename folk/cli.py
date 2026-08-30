@@ -737,7 +737,7 @@ def main():
     p_journal_lint = journal_sub.add_parser("lint", help="lint journal segment(s), no LLM")
     p_journal_lint.add_argument("segments", nargs="+", help="segment NDJSON file(s) to lint together")
     p_journal_lint.add_argument("--transcript", help="raw source transcript (JSONL) for authoritative quote checks")
-    p_journal_lint.add_argument("--user", default="person:charles", help="folk id of the transcript's human speaker")
+    p_journal_lint.add_argument("--user", default="person:sam", help="folk id of the transcript's human speaker")
     p_journal_lint.add_argument("--agent", default="agent:hermes-main", help="folk id of the transcript's agent speaker")
     p_journal_lint.set_defaults(func=cmd_journal_lint)
 

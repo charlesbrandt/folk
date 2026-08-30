@@ -15,7 +15,7 @@ Per-source responsibilities: session id (namespaced so sources never collide —
 
 ## Where it runs
 
-On the promotion host: the session transcripts live there and so does the model (via Ollama, Hermes's own primary — confirmed usable for promotion in COMPARISON.md). The job writes host-local segments; the per-writer segment naming from `journal-in-folk.md` (`YYYY-MM.apu.ndjson`) exists precisely so this machine can append without coordinating with any other writer.
+On the promotion host: the session transcripts live there and so does the model (via Ollama, Hermes's own primary — confirmed usable for promotion in COMPARISON.md). The job writes host-local segments; the per-writer segment naming from `journal-in-folk.md` (`YYYY-MM.desktop.ndjson`) exists precisely so this machine can append without coordinating with any other writer.
 
 **Routing — sessions land in the root of the domain the agent was acting under** (settled with the maintainer 2026-07-19): each Hermes profile declares the folk collection it acts as/in — `hermes-main` conversing with the maintainer → `personal`; a future Cast character roleplaying → `characters` (or its Locus's collection). The job routes each session's events to a host-local staging directory per target collection (`~/.folk-staging/<collection>/YYYY-MM.<writer>.ndjson`), never mixing domains in one segment. Take the profile→collection mapping from job config, one line per profile — don't infer it from content.
 
@@ -49,6 +49,6 @@ Idempotency via a processed-sessions state file on the promotion host (`~/.folk/
 
 ## Exit criteria
 
-- A real Telegram conversation happens; by the next morning its observation events and lint-clean promotions are in the `personal` staging segment `2026-MM.apu.ndjson`; after transport sync + rebuild on the laptop, `folk show charles` shows a new stated fact with a correct verbatim quote and src pointer.
+- A real Telegram conversation happens; by the next morning its observation events and lint-clean promotions are in the `personal` staging segment `2026-MM.desktop.ndjson`; after transport sync + rebuild on the laptop, `folk show sam` shows a new stated fact with a correct verbatim quote and src pointer.
 - A session engineered to produce a lint failure (or a replayed known-bad fixture) lands in quarantine, appears in `folk review`, and appends nothing.
 - Running the job twice in a row processes zero sessions the second time.

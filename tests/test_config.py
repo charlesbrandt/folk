@@ -19,7 +19,7 @@ class TestLoadJournalRoots(unittest.TestCase):
         self.work_dir = self.tmp / "work"
         self.work_dir.mkdir()  # no journal/ subdir -- should not become a root
 
-        self.explicit_root = self.tmp / "apu-staging"
+        self.explicit_root = self.tmp / "host-staging"
         self.explicit_root.mkdir()
 
         self.journal_roots_file = self.tmp / "journal-roots"

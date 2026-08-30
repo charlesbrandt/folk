@@ -32,3 +32,7 @@ web/ui/dist/
 # Local-only real-name denylist for scripts/check_release_hygiene.py --
 # never committed, since the whole point is not shipping these strings.
 scripts/release_hygiene_names_local.py
+
+# Claude Code local state (worktrees, session scratch) -- never intended
+# to ship in the repo.
+.claude/

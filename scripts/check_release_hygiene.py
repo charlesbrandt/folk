@@ -28,16 +28,26 @@ it once per machine:
     cat > scripts/release_hygiene_names_local.py <<'PY'
     import re
     LOCAL_PATTERNS = [
-        ("real person name", re.compile(r"\bCharles\b")),
-        ("real person name", re.compile(r"\bBrandt\b")),
-        ("real person name", re.compile(r"\bTessa\b")),
+        ("real person name", re.compile(r"\bCharles\b", re.IGNORECASE)),
+        ("real person name", re.compile(r"\bBrandt\b", re.IGNORECASE)),
+        ("real person name", re.compile(r"\bTessa\b", re.IGNORECASE)),
     ]
     PY
+
+Use re.IGNORECASE on name patterns -- slugs are lowercase by convention
+(`person:charles`), so a case-sensitive pattern misses the exact form a
+real name most often turns up in. This is not the default in PATTERNS
+below, because one entry there (`plex`) is deliberately case-sensitive to
+avoid flagging the generic product name "Plex" (capitalized) while still
+catching the real lowercase hostname -- don't blanket-add IGNORECASE
+without checking each pattern for that kind of collision.
 
 Without that file, this script still catches infra fingerprints (IPs,
 machine codenames, vault paths) but not real names -- keep the local file
 current as new names turn up in the repo (this is exactly how the
-2026-08-30 audit found `person:tessa-bent` sitting in a design doc).
+2026-08-30 audit found `person:tessa-bent` sitting in a design doc, and a
+follow-up pass found `person:charles` and a lowercase `writer="apu"`
+default that the original case-sensitive patterns had missed).
 """
 import argparse
 import re
@@ -67,7 +77,7 @@ PRIVATE_ONLY = {
 # example doesn't trip this).
 PATTERNS = [
     ("real homelab subnet", re.compile(r"192\.168\.2\.\d{1,3}")),
-    ("machine codename APU", re.compile(r"\bAPU\b")),
+    ("machine codename APU", re.compile(r"\bAPU\b", re.IGNORECASE)),
     ("machine codename elle", re.compile(r"\belle\b")),
     ("machine codename plex", re.compile(r"\bplex\b")),
     ("real repo path segment", re.compile(r"hermes-agent")),

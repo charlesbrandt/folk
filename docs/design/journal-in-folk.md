@@ -19,7 +19,7 @@ The prototype proved the three-record model end-to-end (person files = curated, 
 
 **Registered journal roots — roots follow domain, not writer** (settled with the maintainer 2026-07-19, generalizing the digger community-layer doc's decision 4): there is no single `~/.folk/journal/`. A journal root is a directory of segments scoped to one collection, so agents acting in different domains (hermes-main talking with the maintainer → `personal`; a Cast character roleplaying → `characters`) write to different roots and domains never lump together. Two registration mechanisms: (a) automatic — a registered collection directory containing a `journal/` subdirectory is a root scoped to that collection; (b) explicit — `~/.config/folk/journal-roots` (JSON list of `{"path": ..., "collection": ...}`) for adapter-side roots that live next to their producer, like digger's segments next to its own database on that machine (reaching this machine as plain synced files; transport is an ops detail). A pleasant consequence of (a): collection trees that already live inside their own git repos give collection-side journal segments versioning and backup for free — no new infrastructure.
 
-**Per-writer segments within a root** (`2026-07.laptop.ndjson`, `2026-07.apu.ndjson`): the segment name carries a writer suffix so two machines or agents appending to the same root's month never touch the same file, and synced copies never conflict. Replay globs all segments across all roots; order within the merged index comes from `ts`, not file order. See `session-promotion-job.md` for how the promotion host's writes reach a root.
+**Per-writer segments within a root** (`2026-07.laptop.ndjson`, `2026-07.desktop.ndjson`): the segment name carries a writer suffix so two machines or agents appending to the same root's month never touch the same file, and synced copies never conflict. Replay globs all segments across all roots; order within the merged index comes from `ts`, not file order. See `session-promotion-job.md` for how the promotion host's writes reach a root.
 
 ## Event schema (consolidate from the prototype)
 
@@ -52,6 +52,6 @@ The vocabulary controls predicates but not object slugs, and the prototype's sec
 ## Exit criteria
 
 - The prototype scenario reproduced with folk commands against `~/.folk/`: segments in place, `folk index --rebuild` twice → byte-identical index; delete the index, rebuild → agent-written memories survive.
-- `folk show charles` renders the tiered profile (Curated / Observed / Stated with quotes and src / Interpreted / Bedrock suggestions) from the real index.
+- `folk show sam` renders the tiered profile (Curated / Observed / Stated with quotes and src / Interpreted / Bedrock suggestions) from the real index.
 - `folk journal lint` on a segment containing the prototype's known-bad event (stated quote in someone else's message) fails with the speaker-attribution error; on the clean LLM second-pass output it exits 0 with zero proposals.
 - An alias accepted in vocab.json merges the two slugs' triples in the next rebuild, with the journal untouched.
