@@ -269,12 +269,20 @@ class TestNoLocusTypeEnumerationInCode(unittest.TestCase):
     """docs/design/locus-type.md's hard constraint, same reasoning as
     invariant 7 and appearance.md Decision 2: the Locus Type value set is
     open, so no locus-type value may appear anywhere in folk's own source.
+
+    Sampled from the conventional set documented in locus-type.md/the folk
+    skill, favoring distinctive multi-word compounds over single common
+    English words -- "department" or "resource" alone would false-positive
+    against ordinary, unrelated code (e.g. a scraped record's "department"
+    field name in folk/sources/directory_scrape.py, which describes a
+    person's org unit and has nothing to do with folk validating Locus Type
+    values), the same reason appearance.md's own test picks "distinguishing
+    marks" over "hair".
     """
 
     def test_folk_package_names_no_locus_type_values(self):
         folk_dir = Path(__file__).resolve().parent.parent / "folk"
-        forbidden = ("department", "research-center", "research center",
-                     "resource", "grant", "narrative-place")
+        forbidden = ("research-center", "research center", "narrative-place")
         offenders = []
         for src in sorted(folk_dir.rglob("*.py")):
             text = src.read_text(encoding="utf-8").lower()

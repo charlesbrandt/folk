@@ -6,18 +6,23 @@ A UNIX-philosophy tool for tracking people across collections (personal, work, a
 
 ## Quick start
 
-The examples below use `characters` and `authors`, two of folk's own domain collections (seeded from books read via the personal library — see `docs/design/collections-and-graph.md`), so you can try every command without touching anyone's personal data.
+A small reference collection ships in this repo at `examples/characters/` — a couple of person files (associations, tags, an `## Appearance` section with a checkpoint) and a Locus file (`## Locus Type`, `## Genius Loci`) — so you can try the basics with zero setup, via `-d/--dir` (an explicit filesystem path, no `~/.config/folk/collections` entry required):
 
 ```bash
-folk -C characters list                                # list people in a collection
-folk -C characters show toru-watanabe                   # show a person, tiered profile included
-folk -C authors show haruki-murakami                     # authors get their own collection
-folk -C characters link naoko toru-watanabe childhood-friend
-folk -C characters tag sheep-man recurring
-folk -C characters random                                # remember someone
-folk -C characters stats                                 # collection overview
+folk -d examples/characters list                                # list people in a collection
+folk -d examples/characters show toru-watanabe                   # show a person, tiered profile included
+folk -d examples/characters link naoko toru-watanabe childhood-friend
+folk -d examples/characters tag sheep-man recurring
+folk -d examples/characters random                                # remember someone
+folk -d examples/characters stats                                 # collection overview
+```
+
+`folk graph`, `folk lookup`, and `folk show locus:<slug>` read across every collection registered in `~/.config/folk/collections` (and the rebuilt triple index) rather than an ad hoc `-d` path, so trying those against the fixture data means registering `examples/characters` there first and running `folk index --rebuild` once. Once you've registered your own collections (see "Collections" below):
+
+```bash
 folk -C characters graph --person toru-watanabe --depth 2  # Mermaid graph, terminal-first
-folk lookup "toru watanabe" --json                     # does this person exist? (checks every collection)
+folk -C authors show haruki-murakami                     # authors get their own collection
+folk lookup "toru watanabe" --json                     # does this person exist? (checks every registered collection)
 ```
 
 ## Collections
