@@ -157,7 +157,12 @@ def show_person(fpath):
     """Parse and return a structured representation of a person file.
 
     Returns dict with name, file, content, sections, bio, archetype, voice,
-    tags, associations, media, defining_moments.
+    tags, associations, media, defining_moments. Also carries `locus_type`
+    (docs/design/locus-type.md), a single free-text value under
+    `## Locus Type` -- parsed the same way as archetype/voice, empty string
+    when absent. Meaningful only on a Locus file (`show_locus` delegates
+    here, per docs/design/loci.md); an ordinary person file will simply
+    never have this section, the same way a Locus rarely has ## Archetype.
     """
     content = fpath.read_text(encoding="utf-8", errors="replace")
     name = _read_heading(fpath)
@@ -177,6 +182,7 @@ def show_person(fpath):
         "bio": _parse_bio(sections),
         "archetype": _parse_free_text(sections, "archetype"),
         "voice": _parse_free_text(sections, "voice"),
+        "locus_type": _parse_free_text(sections, "locus type"),
         "tags": _parse_tags(sections),
         "appearance": _parse_appearance(sections),
         "appearance_checkpoints": _parse_appearance_checkpoints(sections),
