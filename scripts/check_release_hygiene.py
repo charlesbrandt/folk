@@ -58,14 +58,20 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parent.parent
 SELF = Path(__file__).resolve()
 
-# Files allowed to carry real infra/ops detail because they never ship to
-# the public export -- they document this private repo's own real
-# deployment history, not the generic tool. Keep this list in sync with
-# whatever actually gets excluded when building the public mirror.
+# This list is inherited from the private source repo's copy of this
+# script, where these filenames carry real infra/ops detail and never get
+# exported here. In this repo (the public export itself) none of them
+# should ever appear as tracked files -- if `git ls-files` ever does list
+# one, that's a signal something private-only leaked into the export, not
+# a reason to add it here. (`docs/design/collection-registry-integrity.md`
+# used to be in this set too -- removed 2026-08-30 once a genericized,
+# already-clean spec doc of the same name was authored and shipped here;
+# the private repo's file of that name is a different, sensitive audit
+# document that stays there, unexported, under the same filename.) Keep
+# this list in sync with whatever the private repo's own script excludes.
 PRIVATE_ONLY = {
     "docs/HANDOFF.md",
     "docs/design/history-scrub.md",
-    "docs/design/collection-registry-integrity.md",
     "journal.md",
     "todo.md",
 }
