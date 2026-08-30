@@ -228,5 +228,61 @@ class TestNoCollisionWithPersonFileWalk(LociScenarioTestCase):
         self.assertFalse(any(name == "Murakami World" for name, _fpath in people))
 
 
+class TestLocusType(unittest.TestCase):
+    """Tests for `## Locus Type` (docs/design/locus-type.md) -- an open,
+    unenumerated classifier value, parsed the same way as ## Archetype/
+    ## Voice via person._parse_free_text.
+    """
+
+    def setUp(self):
+        self.tmp = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, self.tmp, ignore_errors=True)
+
+    def test_locus_type_parses_via_show_locus(self):
+        fpath = self.tmp / "iusm-neurology" / "iusm-neurology.md"
+        _write_md(fpath, "Neurology", sections={
+            "Locus Type": ["department"],
+            "Genius Loci": ["Fluorescent hallways, quiet urgency."],
+        })
+        info = locus.show_locus(fpath)
+        self.assertEqual(info["locus_type"], "department")
+
+    def test_missing_locus_type_is_empty_string_not_error(self):
+        fpath = self.tmp / "murakami-world" / "murakami-world.md"
+        _write_md(fpath, "Murakami World", sections={
+            "Genius Loci": ["A liminal, melancholy place."],
+        })
+        info = locus.show_locus(fpath)
+        self.assertEqual(info["locus_type"], "")
+
+    def test_locus_type_also_present_and_empty_on_ordinary_person_files(self):
+        # Consistent with how appearance/appearance_checkpoints already
+        # behave on non-Locus files: the key always exists, just empty.
+        fpath = self.tmp / "s" / "sam" / "sam.md"
+        _write_md(fpath, "Sam", sections={"Tags": ["friend"]})
+        from folk.person import show_person
+        info = show_person(fpath)
+        self.assertEqual(info["locus_type"], "")
+
+
+class TestNoLocusTypeEnumerationInCode(unittest.TestCase):
+    """docs/design/locus-type.md's hard constraint, same reasoning as
+    invariant 7 and appearance.md Decision 2: the Locus Type value set is
+    open, so no locus-type value may appear anywhere in folk's own source.
+    """
+
+    def test_folk_package_names_no_locus_type_values(self):
+        folk_dir = Path(__file__).resolve().parent.parent / "folk"
+        forbidden = ("department", "research-center", "research center",
+                     "resource", "grant", "narrative-place")
+        offenders = []
+        for src in sorted(folk_dir.rglob("*.py")):
+            text = src.read_text(encoding="utf-8").lower()
+            for value in forbidden:
+                if value in text:
+                    offenders.append(f"{src.name}: {value}")
+        self.assertEqual(offenders, [], f"locus-type values found in folk/: {offenders}")
+
+
 if __name__ == "__main__":
     unittest.main()

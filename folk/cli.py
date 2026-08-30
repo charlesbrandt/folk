@@ -208,6 +208,10 @@ def _show_locus(slug):
     print(f"File: {info['file']}")
     print()
 
+    if info["locus_type"]:
+        print(f"Locus Type: {info['locus_type']}")
+        print()
+
     if info["tags"]:
         print(f"Tags: {' '.join(info['tags'])}")
         print()
