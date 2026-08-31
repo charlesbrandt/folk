@@ -5,6 +5,10 @@ Collections are stored in ~/.config/folk/collections as a JSON mapping:
 
 State is stored in ~/.config/folk/state as JSON:
   {"active_collection": "personal"}
+
+A collection may additionally describe itself with a COLLECTION.json file in
+its own root directory (docs/design/collection-curation.md):
+  {"curation": "agent"}
 """
 
 import json
@@ -17,6 +21,10 @@ STATE_FILE = CONFIG_DIR / "state"
 JOURNAL_ROOTS_FILE = CONFIG_DIR / "journal-roots"
 LOCI_ROOTS_FILE = CONFIG_DIR / "loci-roots"
 VOCAB_FILE = CONFIG_DIR / "vocab.json"
+
+COLLECTION_DESCRIPTOR_FILE = "COLLECTION.json"
+CURATION_AGENT = "agent"
+CURATION_HUMAN = "human"
 
 
 def ensure_config_dir():
@@ -82,6 +90,35 @@ def resolve_collection_dir(collection_name=None, explicit_dir=None):
             return Path(collections[active]), active
 
     raise ValueError("no collection configured -- run 'folk context <name>' or set FOLK_DIR")
+
+
+def load_collection_descriptor(collection_dir):
+    """Return a collection's own descriptor, read from COLLECTION.json in its
+    root directory (docs/design/collection-curation.md).
+
+    The only key this pass understands is `curation`, and the returned value is
+    always already resolved to exactly "agent" or "human" -- never None, never
+    anything else -- so no caller has to re-derive "was the file missing or
+    malformed" for itself. **Fail closed:** absent file, unreadable file,
+    malformed JSON, a non-object document, or any `curation` value other than
+    the literal string "agent" all resolve to "human", which is today's
+    behavior, unchanged, for every collection that does not opt in.
+
+    A collection is config, never code (invariant 7): which collections are
+    agent-curated is a fact stated on disk by the collection itself, and no
+    collection name appears here.
+    """
+    path = Path(collection_dir) / COLLECTION_DESCRIPTOR_FILE
+    data = None
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError, UnicodeDecodeError, ValueError):
+        data = None
+
+    curation = data.get("curation") if isinstance(data, dict) else None
+    if curation != CURATION_AGENT:
+        curation = CURATION_HUMAN
+    return {"curation": curation}
 
 
 def load_journal_roots():

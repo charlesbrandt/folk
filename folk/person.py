@@ -13,7 +13,10 @@ import random
 import re
 from pathlib import Path
 
+from . import config
+
 PERSON_FILE = re.compile(r"^[a-zA-Z0-9][a-zA-Z0-9_-]*\.md$")
+SLUG_RE = re.compile(r"^[a-zA-Z0-9][a-zA-Z0-9_-]*$")
 HEADING_RE = re.compile(r"^#\s+(.+)$")
 SECTION_RE = re.compile(r"^##\s+(.+)$")
 ASSOC_ENTRY_RE = re.compile(r"^-\s+\[(.+?)\](?:\(([^)]*)\))?\s*[—–-]?\s*(.+)$")
@@ -489,6 +492,61 @@ def add_tag(collection_dir, name, tag):
 
     fpath.write_text(_build_content(sections))
     return f"tagged {_read_heading(fpath)} with '{tag}'"
+
+
+class CurationRefused(Exception):
+    """Raised when an automated caller tries to create a person file in a
+    collection whose curation policy is `human` (docs/design/collection-curation.md).
+    """
+
+
+def create_person_file_as_agent(collection_dir, slug, display_name, body=""):
+    """Create a new person file on behalf of an automated process.
+
+    This is the *agent* creation path (docs/design/collection-curation.md) and
+    the only one gated by the collection's curation policy: it reads the target
+    collection's COLLECTION.json and refuses with CurationRefused unless that
+    collection declares `{"curation": "agent"}`. Absent, unreadable, malformed,
+    or any other value means `human` and means refusal -- fail closed, so every
+    existing collection is protected without being touched.
+
+    The gate is on *creation by a machine* only. It restricts nothing a human
+    does: person files stay plain markdown in git, a human may create or edit
+    any file in any collection by any means, and no folk code path checks this
+    policy on an edit.
+
+    Once a human edits an agent-curated file, the file is theirs and the agent
+    should stop rewriting it. That is a documented convention, deliberately not
+    enforced in code -- the same posture as appearance.md Decision 6 and
+    folk-render.md Decision 5, "documented convention over code-enforced
+    restriction."
+
+    Writes {collection}/{initial}/{slug}/{slug}.md and returns its Path.
+    Raises FileExistsError if that file already exists -- creation never
+    overwrites; an update to an existing file is a different act with a
+    different owner.
+    """
+    if not SLUG_RE.match(slug or ""):
+        raise ValueError(f"'{slug}' is not a valid person slug")
+
+    collection_dir = Path(collection_dir)
+    descriptor = config.load_collection_descriptor(collection_dir)
+    if descriptor["curation"] != config.CURATION_AGENT:
+        raise CurationRefused(
+            f"collection at {collection_dir} has curation policy "
+            f"'{descriptor['curation']}': only a human creates person files there"
+        )
+
+    fpath = collection_dir / slug[0].lower() / slug / f"{slug}.md"
+    if fpath.exists():
+        raise FileExistsError(f"person file already exists: {fpath}")
+
+    fpath.parent.mkdir(parents=True, exist_ok=True)
+    text = f"# {display_name}\n"
+    if body:
+        text += f"\n{body.rstrip()}\n"
+    fpath.write_text(text, encoding="utf-8")
+    return fpath
 
 
 def random_person(collection_dir, context_tag=None):
