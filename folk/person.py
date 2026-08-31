@@ -15,14 +15,22 @@ from pathlib import Path
 
 from . import config
 
-PERSON_FILE = re.compile(r"^[a-zA-Z0-9][a-zA-Z0-9_-]*\.md$")
-SLUG_RE = re.compile(r"^[a-zA-Z0-9][a-zA-Z0-9_-]*$")
+# Unicode-aware (Python 3's \w already matches any script's letters/digits
+# plus underscore, not just ASCII) so a slug from graph.slugify() -- which
+# preserves non-Latin glyphs that survive NFKD folding intact rather than
+# stripping them, docs/design/collection-curation.md -- validates the same
+# way it's generated. The `(?!_)` keeps the existing rule that a slug may
+# not *start* with underscore; underscore stays allowed mid-slug.
+PERSON_FILE = re.compile(r"^(?!_)\w[\w-]*\.md$")
+SLUG_RE = re.compile(r"^(?!_)\w[\w-]*$")
 HEADING_RE = re.compile(r"^#\s+(.+)$")
 SECTION_RE = re.compile(r"^##\s+(.+)$")
 ASSOC_ENTRY_RE = re.compile(r"^-\s+\[(.+?)\](?:\(([^)]*)\))?\s*[—–-]?\s*(.+)$")
-# An association href of the form "type:slug" (e.g. "work:norwegian-wood")
-# names a non-person entity explicitly, rather than a file-relative path.
-TYPED_REF_RE = re.compile(r"^[a-z][a-z0-9_]*:[a-zA-Z0-9][a-zA-Z0-9_-]*$")
+# An association href of the form "type:slug" (e.g. "work:norwegian-wood").
+# The type prefix (before the colon) is folk's own vocabulary, always
+# ASCII-lowercase; the slug half follows the same unicode-aware rule as
+# SLUG_RE above.
+TYPED_REF_RE = re.compile(r"^[a-z][a-z0-9_]*:(?!_)\w[\w-]*$")
 TAG_LINE_RE = re.compile(r"^([a-zA-Z0-9_-]+(?:\s+[a-zA-Z0-9_-]+)*)$")
 MEDIA_ENTRY_RE = re.compile(r"^-\s+(.+?)\s*[—–-]\s*(.+)$")
 # "- birthday: 03-14" or "- anniversary: 2019-06-02" -- month-day required,

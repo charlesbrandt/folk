@@ -25,6 +25,40 @@ def _write_person(path, heading, associations=(), tags=()):
     path.write_text("\n".join(lines) + "\n")
 
 
+class TestSlugify(unittest.TestCase):
+    """docs/design/collection-curation.md: slugify() folds Latin diacritics
+    to ASCII but preserves non-Latin scripts rather than stripping them.
+    """
+
+    def test_ascii_unchanged(self):
+        self.assertEqual(graph.slugify("Toru Watanabe"), "toru-watanabe")
+
+    def test_diacritics_fold_to_ascii(self):
+        # "ð" (eth) isn't a diacritic-decorated Latin letter under NFKD --
+        # unlike ö/ó, it has no decomposition and is its own distinct
+        # letter, so it's preserved rather than force-folded to "d".
+        self.assertEqual(graph.slugify("Björk Guðmundsdóttir"), "bjork-guðmundsdottir")
+        self.assertEqual(graph.slugify("café"), "cafe")
+        self.assertEqual(graph.slugify("François"), "francois")
+
+    def test_non_latin_scripts_preserved_not_stripped(self):
+        self.assertEqual(graph.slugify("北野武"), "北野武")
+        self.assertEqual(graph.slugify("Иван Петров"), "иван-петров")
+
+    def test_mixed_script_name(self):
+        self.assertEqual(graph.slugify("Takeshi 北野武 Kitano"), "takeshi-北野武-kitano")
+
+    def test_punctuation_and_whitespace_collapse_to_single_hyphen(self):
+        self.assertEqual(graph.slugify("  Mary   Jane -- Watson  "), "mary-jane-watson")
+
+    def test_underscore_is_not_preserved_as_a_letter(self):
+        self.assertEqual(graph.slugify("under_score"), "under-score")
+
+    def test_empty_and_all_punctuation_input(self):
+        self.assertEqual(graph.slugify(""), "")
+        self.assertEqual(graph.slugify("---"), "")
+
+
 class GraphTestBase(unittest.TestCase):
 
     def setUp(self):

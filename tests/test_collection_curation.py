@@ -147,10 +147,19 @@ class TestCreatePersonFileAsAgent(unittest.TestCase):
 
     def test_rejects_an_invalid_slug_before_touching_disk(self):
         self._set_curation("agent")
-        for bad in ("", "a figure", "../escape", "-leading"):
+        for bad in ("", "a figure", "../escape", "-leading", "_leading"):
             with self.subTest(slug=bad):
                 with self.assertRaises(ValueError):
                     person.create_person_file_as_agent(self.coll, bad, "A Figure")
+
+    def test_accepts_a_unicode_slug(self):
+        # SLUG_RE/PERSON_FILE are unicode-aware for the same reason
+        # graph.slugify() preserves non-Latin scripts (docs/design/
+        # collection-curation.md) -- a slug it derives must validate here.
+        self._set_curation("agent")
+        fpath = person.create_person_file_as_agent(self.coll, "北野武", "Takeshi Kitano")
+        self.assertEqual(fpath, self.coll / "北" / "北野武" / "北野武.md")
+        self.assertTrue(fpath.exists())
 
 
 class TestHumanEditPathIsUngated(unittest.TestCase):
