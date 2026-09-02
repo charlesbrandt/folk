@@ -54,6 +54,8 @@ What a real deployment still has to supply:
     docs/design/bulk-import.md's worked example
 """
 
+from ..slug import slugify
+
 ACTOR = "import:directory-scrape:v1"
 
 
@@ -69,11 +71,16 @@ def fetch(profile_cfg):
 
 
 def _slug(text):
-    """Lowercase-hyphen slug from free text -- the same normalization
-    convention graph.slugify() already applies to person display names,
-    used here for department/org names and title strings too.
+    """Lowercase-hyphen slug from free text, via the same folk.slug.slugify()
+    used for person display names -- department/org names and title strings
+    go through it too, so a punctuation-bearing string (credentials riding
+    along in a name, "Radiation Oncology, Practice") produces the same
+    well-formed slug journal.append_event's lint requires. A prior local
+    reimplementation only collapsed whitespace and left other punctuation
+    (commas, parens) in place, producing malformed slugs that failed lint
+    on every event.
     """
-    return "-".join((text or "").lower().split())
+    return slugify(text or "")
 
 
 def parse(raw_record, ts, actor=ACTOR):
