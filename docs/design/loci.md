@@ -49,6 +49,8 @@ Nothing authoritative in two places — same invariant, same guarantee.
 
 New in `folk/config.py`: `load_loci_roots()`, a near-literal copy of `load_journal_roots()` with `journal` swapped for `loci` and `JOURNAL_ROOTS_FILE` swapped for a `LOCI_ROOTS_FILE` constant (`~/.config/folk/loci-roots`).
 
+**On-disk layout is flat — `{loci-root}/{slug}/{slug}.md`, no `{initial}/` subdirectory.** This differs from person files (`{collection}/{initial}/{slug}/{slug}.md`, `folk/person.py`), and the difference is easy to miss by pattern-matching against the more familiar person layout: `folk/locus.py`'s `_locus_files()` iterates a loci root's immediate children expecting each to *be* a slug directory, so a Locus file written at `{root}/d/department-name/department-name.md` (the person convention, with `d` as the initial) is invisible to `folk show locus:<slug>`, `folk graph --locus`, and index rebuild's locus-triple replay — silently, no error anywhere, on write or on read. A real deployment hit exactly this (iusm-directory, 2026-09-02): a hand-rolled department-locus minting helper copied the person-file layout, and 26 Locus files sat on disk, fully populated, completely unreadable by every folk command that reads Loci, until the layout was corrected. Anything that mints a Locus file outside `folk/locus.py` itself should either reuse a shared helper or be tested against `folk show locus:<slug>` immediately after writing, not just against the file existing on disk.
+
 ## Scope for v1
 
 - `load_loci_roots()` in `folk/config.py`.
