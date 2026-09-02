@@ -20,8 +20,15 @@ from datetime import date, datetime
 from pathlib import Path
 
 from . import config
+from .slug import slugify
 
-SLUG_RE = re.compile(r"^[a-z]+:[a-z0-9][a-z0-9-]*$")
+# Type prefix stays ASCII-lowercase (invariant 7: types are controlled
+# vocabulary, not user text). The slug body is Unicode-aware (\w matches any
+# script's letters/digits plus underscore, not just ASCII) so it accepts
+# exactly what slug.slugify() below can produce for a non-Latin or accented
+# display name -- see docs/design/unicode-slugs.md and person.py's SLUG_RE,
+# widened the same way for the same reason.
+SLUG_RE = re.compile(r"^[a-z]+:(?!_)\w[\w-]*$")
 MSG_SRC_RE = re.compile(r"^msg:.+#(\d+)$")
 THINK_RE = re.compile(r"<think>.*?</think>", re.DOTALL)
 SHINGLE = 5  # consecutive words that must match, in order, to verify a quote
@@ -457,7 +464,7 @@ def _person_triples(collection_dir, collection_name):
                 target_id = ref
             else:
                 target_name = assoc.get("name", "")
-                target_id = "person:" + re.sub(r"[^a-z0-9]+", "-", target_name.lower()).strip("-")
+                target_id = "person:" + slugify(target_name)
             rel = assoc.get("type") or "associated"
             triples.append({"s": sid, "p": rel, "o": target_id,
                              "tier": "human", "col": collection_name, "src": fpath.name})
@@ -499,7 +506,7 @@ def _locus_triples(loci_root_dir, collection_name):
                 target_id = ref
             else:
                 target_name = assoc.get("name", "")
-                target_id = "person:" + re.sub(r"[^a-z0-9]+", "-", target_name.lower()).strip("-")
+                target_id = "person:" + slugify(target_name)
             rel = assoc.get("type") or "associated"
             triples.append({"s": sid, "p": rel, "o": target_id,
                              "tier": "human", "col": collection_name, "src": fpath.name})

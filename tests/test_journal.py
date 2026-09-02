@@ -268,6 +268,52 @@ class TestLint(unittest.TestCase):
         self.assertEqual(errors, [])
         self.assertTrue(any("brand_new_predicate" in p for p in proposals))
 
+    def test_unicode_object_slug_is_not_malformed(self):
+        # docs/design/unicode-slugs.md: the slug body accepts any script's
+        # letters/digits post-fold, not just ascii, mirroring person.SLUG_RE.
+        e = _wrap({"kind": "promotion", "evidence": "interpreted", "level": "core",
+                    "s": "person:mara", "p": "interested_in", "o": "person:björk",
+                    "note": "n", "src": "msg:foo#0"})
+        errors, _ = journal.lint_events([e], vocab={"types": ["person"], "predicates": {}, "aliases": {}})
+        self.assertFalse(any("malformed slug" in err for err in errors), errors)
+
+    def test_uppercase_type_prefix_still_malformed(self):
+        # The type prefix stays ascii-lowercase (invariant 7: controlled
+        # vocabulary) -- only the slug body was widened.
+        e = _wrap({"kind": "promotion", "evidence": "interpreted", "level": "core",
+                    "s": "person:mara", "p": "interested_in", "o": "Person:sam",
+                    "note": "n", "src": "msg:foo#0"})
+        errors, _ = journal.lint_events([e], vocab={"types": ["person"], "predicates": {}, "aliases": {}})
+        self.assertTrue(any("malformed slug" in err for err in errors), errors)
+
+
+class TestAssociationFallbackSlug(unittest.TestCase):
+    """docs/design/unicode-slugs.md: a free-text `## Associations` entry
+    (no explicit `type:slug` ref) must resolve to the same slug the
+    referenced person's own file actually has, for non-ASCII names too.
+    """
+
+    def setUp(self):
+        self.tmp = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, self.tmp, ignore_errors=True)
+        self.collection_dir = self.tmp / "personal"
+
+        target_dir = self.collection_dir / "b" / "bjork"
+        target_dir.mkdir(parents=True)
+        (target_dir / "bjork.md").write_text("# Björk\n")
+
+        referrer_dir = self.collection_dir / "a" / "alice"
+        referrer_dir.mkdir(parents=True)
+        (referrer_dir / "alice.md").write_text(
+            "# Alice\n\n## Associations\n- [Björk] — collaborator\n")
+
+    def test_free_text_association_resolves_to_the_real_slug(self):
+        triples = journal._person_triples(self.collection_dir, "personal")
+        assoc = [t for t in triples if t["s"] == "person:alice" and t["p"] == "collaborator"]
+        self.assertEqual(len(assoc), 1, triples)
+        self.assertEqual(assoc[0]["o"], "person:bjork",
+                          "the derived object slug must match the real person file's directory slug")
+
 
 class TestRedactionAndReview(unittest.TestCase):
 
