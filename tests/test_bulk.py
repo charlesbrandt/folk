@@ -1,5 +1,6 @@
 """Tests for folk/bulk.py against docs/design/bulk-import.md's exit criteria."""
 
+import json
 import shutil
 import tempfile
 import unittest
@@ -72,6 +73,89 @@ class TestImportBatch(unittest.TestCase):
         self.assertEqual([o["src"] for o in outcomes],
                          ["directory-scrape:profile:1#department",
                           "directory-scrape:profile:2#department"])
+
+
+class TestImportBatchMinting(unittest.TestCase):
+    """docs/design/collection-curation.md's create_person_file_as_agent,
+    wired into import_batch per docs/design/bulk-import.md's "Not built"
+    follow-up.
+    """
+
+    def setUp(self):
+        self.tmp = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, self.tmp, ignore_errors=True)
+        self.root = self.tmp / "journal"
+        self.agent_collection = self.tmp / "agent-collection"
+        self.agent_collection.mkdir()
+        (self.agent_collection / "COLLECTION.json").write_text(
+            json.dumps({"curation": "agent"}), encoding="utf-8")
+        self.human_collection = self.tmp / "human-collection"
+        self.human_collection.mkdir()  # no COLLECTION.json -- fails closed to human
+
+    def test_no_collection_dir_mints_nothing(self):
+        outcomes = bulk.import_batch(self.root, "directory-scrape", [_good_event(1)],
+                                      person_names={"person:record-1": "Record One"})
+        self.assertEqual(outcomes[0]["status"], "appended")
+        self.assertIsNone(outcomes[0]["minted"])
+
+    def test_agent_curated_collection_mints_from_person_names(self):
+        outcomes = bulk.import_batch(
+            self.root, "directory-scrape", [_good_event(1)],
+            collection_dir=self.agent_collection,
+            person_names={"person:record-1": "Record One"})
+
+        fpath = self.agent_collection / "r" / "record-1" / "record-1.md"
+        self.assertEqual(outcomes[0]["minted"], str(fpath))
+        self.assertTrue(fpath.exists())
+        self.assertEqual(fpath.read_text(encoding="utf-8").splitlines()[0], "# Record One")
+
+    def test_missing_display_name_mints_nothing_but_still_appends(self):
+        outcomes = bulk.import_batch(
+            self.root, "directory-scrape", [_good_event(1)],
+            collection_dir=self.agent_collection, person_names={})
+
+        self.assertEqual(outcomes[0]["status"], "appended")
+        self.assertIsNone(outcomes[0]["minted"])
+        self.assertFalse((self.agent_collection / "r" / "record-1" / "record-1.md").exists())
+
+    def test_human_curated_collection_refuses_minting_but_still_appends(self):
+        outcomes = bulk.import_batch(
+            self.root, "directory-scrape", [_good_event(1)],
+            collection_dir=self.human_collection,
+            person_names={"person:record-1": "Record One"})
+
+        self.assertEqual(outcomes[0]["status"], "appended")
+        self.assertIsNone(outcomes[0]["minted"])
+        self.assertFalse((self.human_collection / "r" / "record-1" / "record-1.md").exists())
+
+    def test_second_event_for_same_subject_is_not_reminted(self):
+        events = [_good_event(1),
+                  {**_good_event(1), "p": "holds_title", "o": "title:researcher",
+                   "src": "directory-scrape:profile:1#title"}]
+        outcomes = bulk.import_batch(
+            self.root, "directory-scrape", events,
+            collection_dir=self.agent_collection,
+            person_names={"person:record-1": "Record One"})
+
+        self.assertIsNotNone(outcomes[0]["minted"])
+        self.assertIsNone(outcomes[1]["minted"])
+        # Only one file, not overwritten or duplicated.
+        self.assertEqual(
+            len(list((self.agent_collection / "r" / "record-1").iterdir())), 1)
+
+    def test_preexisting_file_is_not_overwritten_and_batch_still_appends(self):
+        fdir = self.agent_collection / "r" / "record-1"
+        fdir.mkdir(parents=True)
+        (fdir / "record-1.md").write_text("# Record One\n\nhand-authored\n", encoding="utf-8")
+
+        outcomes = bulk.import_batch(
+            self.root, "directory-scrape", [_good_event(1)],
+            collection_dir=self.agent_collection,
+            person_names={"person:record-1": "Record One"})
+
+        self.assertEqual(outcomes[0]["status"], "appended")
+        self.assertIsNone(outcomes[0]["minted"])
+        self.assertIn("hand-authored", (fdir / "record-1.md").read_text(encoding="utf-8"))
 
 
 if __name__ == "__main__":
