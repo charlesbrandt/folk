@@ -39,6 +39,22 @@ docker compose up --build
 
 API on :8500, UI dev server on :5175. `docker-compose.yml`'s volume mounts are host-specific -- they bind-mount `~/.config/folk`, `~/.folk`, and wherever your collections live at identical absolute paths inside the container (folk's `config.py` resolves via `Path.home()` and `collections.json` stores absolute host paths, so path identity has to be preserved across the container boundary). Adjust the mount list to match your own `~/.config/folk/collections`.
 
+**Don't edit the tracked compose file per machine — use a `docker-compose.override.yml`** (untracked; compose merges it automatically). Two gotchas the shipped file hits on any machine whose collections aren't under `~/people`: (1) the shipped `api` mount maps `~/people` to `/home/folkuser/people`, which is *not* an identical-path mount, so absolute paths in `collections` won't resolve in the container; (2) the default ports may already be taken (`ss -ltn | grep -E ':(8500|5175)\b'` before `up`). A merged `volumes:`/`ports:` list *appends* by default, so use the `!override` tag (Compose v2.24+) to replace rather than extend:
+
+```yaml
+services:
+  api:
+    volumes: !override
+      - /home/you/.config/folk:/home/folkuser/.config/folk:ro
+      - /home/you/.folk:/home/folkuser/.folk:ro
+      - /data/people:/data/people:ro        # identical host:container path, one per collection
+  ui:
+    ports: !override
+      - "5176:5175"                         # host port only; the container port stays 5175
+```
+
+Mount each collection directory individually rather than a parent tree, so a sibling directory with unrelated sensitive files is never visible to the container. The index is mounted read-only, so run `folk index --rebuild` on the *host* (after setting up `~/.config/folk/collections`) before starting, and again after any data pull — the container can't rebuild it. Verify with `docker compose ps` (both `healthy`), `curl localhost:8500/collections`.
+
 ## Ports
 
 - API: `8500`, UI dev server: `5175` -- picked to avoid colliding with other services you might already be running; adjust freely.
@@ -75,4 +91,4 @@ Svelte 4 + Vite, hash-based routing (no router library -- same house pattern as 
 
 ## What's explicitly not here
 
-Corkboard, Studio, the Focus panel's real ranking (needs `folk focus`, landed in Wave 1a but not yet wired into a Home panel), the Reminders panel's real data (needs `folk agenda`, same status), and any UI for Part B's arbitrary-Bedrock-section inline edit beyond the two endpoints themselves and the `api.ts` client methods (`editPreview`/`editCommit`) -- `docs/design/web-ui.md` Part A explicitly asks for a `Review.svelte` view; Part B does not name a specific Person-page UI component, so none was added this pass to avoid touching `views/Person.svelte` while a sibling build wave is concurrently working in `web/`. See `docs/design/web-ui.md` "Scope for v1" for the fuller list and rationale.
+Corkboard, Studio, any UI for Part B's arbitrary-Bedrock-section inline edit beyond the two endpoints themselves and the `api.ts` client methods (`editPreview`/`editCommit`) -- `docs/design/web-ui.md` Part A explicitly asks for a `Review.svelte` view; Part B does not name a specific Person-page UI component, so none was added this pass to avoid touching `views/Person.svelte` while a sibling build wave is concurrently working in `web/`. See `docs/design/web-ui.md` "Scope for v1" for the fuller list and rationale.
