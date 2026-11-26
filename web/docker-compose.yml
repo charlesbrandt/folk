@@ -19,11 +19,13 @@ services:
     ports:
       - "8500:8000"
     environment:
-      - HOME=/home/folkuser
+      # Container HOME == host HOME, so Path.home() and the absolute paths in
+      # collections.json resolve identically inside and outside the container.
+      - HOME=${HOME}
     volumes:
-      - ${HOME}/.config/folk:/home/folkuser/.config/folk:ro
-      - ${HOME}/.folk:/home/folkuser/.folk:ro
-      - ${HOME}/people:/home/folkuser/people:ro
+      - ${HOME}/.config/folk:${HOME}/.config/folk:ro
+      - ${HOME}/.folk:${HOME}/.folk:ro
+      - ${HOME}/people:${HOME}/people:ro
     command: uvicorn api:app --host 0.0.0.0 --port 8000 --reload
     restart: unless-stopped
     healthcheck:

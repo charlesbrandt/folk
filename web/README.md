@@ -39,14 +39,14 @@ docker compose up --build
 
 API on :8500, UI dev server on :5175. `docker-compose.yml`'s volume mounts are host-specific -- they bind-mount `~/.config/folk`, `~/.folk`, and wherever your collections live at identical absolute paths inside the container (folk's `config.py` resolves via `Path.home()` and `collections.json` stores absolute host paths, so path identity has to be preserved across the container boundary). Adjust the mount list to match your own `~/.config/folk/collections`.
 
-**Don't edit the tracked compose file per machine — use a `docker-compose.override.yml`** (untracked; compose merges it automatically). Two gotchas the shipped file hits on any machine whose collections aren't under `~/people`: (1) the shipped `api` mount maps `~/people` to `/home/folkuser/people`, which is *not* an identical-path mount, so absolute paths in `collections` won't resolve in the container; (2) the default ports may already be taken (`ss -ltn | grep -E ':(8500|5175)\b'` before `up`). A merged `volumes:`/`ports:` list *appends* by default, so use the `!override` tag (Compose v2.24+) to replace rather than extend:
+**Mounts are identical-path by construction:** the shipped file sets the container's `HOME` to your host `$HOME` and mounts `~/.config/folk`, `~/.folk` and `~/people` at the same absolute paths, so it works as-is when your collections live under `~/people`. For collections anywhere else, don't edit the tracked file — add an untracked `docker-compose.override.yml` (compose merges it automatically). Also check the default ports aren't taken (`ss -ltn | grep -E ':(8500|5175)\b'` before `up`). A merged `volumes:`/`ports:` list *appends* by default, so use the `!override` tag (Compose v2.24+) to replace rather than extend:
 
 ```yaml
 services:
   api:
     volumes: !override
-      - /home/you/.config/folk:/home/folkuser/.config/folk:ro
-      - /home/you/.folk:/home/folkuser/.folk:ro
+      - /home/you/.config/folk:/home/you/.config/folk:ro   # keep config/index at the host HOME path
+      - /home/you/.folk:/home/you/.folk:ro
       - /data/people:/data/people:ro        # identical host:container path, one per collection
   ui:
     ports: !override
