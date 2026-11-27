@@ -13,6 +13,7 @@ its own root directory (docs/design/collection-curation.md):
 
 import json
 import os
+import sys
 from pathlib import Path
 
 CONFIG_DIR = Path.home() / ".config" / "folk"
@@ -25,6 +26,38 @@ VOCAB_FILE = CONFIG_DIR / "vocab.json"
 COLLECTION_DESCRIPTOR_FILE = "COLLECTION.json"
 CURATION_AGENT = "agent"
 CURATION_HUMAN = "human"
+
+
+class CollectionMissing(ValueError):
+    """A collection was explicitly requested but its directory does not exist.
+
+    An integrity error (the registry entry or path is out of date, or the repo
+    isn't cloned here), distinct from the config error "unknown collection".
+    Subclasses ValueError so existing CLI/web handlers report it and exit nonzero.
+    (docs/design/collection-registry-integrity.md, Decision 2.)
+    """
+
+
+_WARNED_MISSING = set()
+
+
+def warn_missing_collection(path):
+    """Tolerant-mode notice: a registered collection directory is absent.
+
+    Iterating every registered collection skips an absent one rather than
+    failing, but says so on stderr (once per path per process); stdout stays
+    clean so the tolerant path remains pipeable.
+    """
+    key = str(path)
+    if key in _WARNED_MISSING:
+        return
+    _WARNED_MISSING.add(key)
+    print(f"folk: warning: collection directory not found, skipping: {key}", file=sys.stderr)
+
+
+def _require_dir(path, label):
+    if not Path(path).is_dir():
+        raise CollectionMissing(f"collection {label!r}: directory does not exist: {path}")
 
 
 def ensure_config_dir():
@@ -69,17 +102,27 @@ def save_state(state):
 
 
 def resolve_collection_dir(collection_name=None, explicit_dir=None):
+    """Resolve the single collection a command operates on.
+
+    A collection named here was explicitly requested (-C, -d, $FOLK_DIR, or the
+    active context), so a missing directory is a hard error (CollectionMissing),
+    not "no residents". Iterate-all callers don't come through here; they skip
+    absent collections with warn_missing_collection.
+    """
     if explicit_dir:
+        _require_dir(explicit_dir, explicit_dir)
         return Path(explicit_dir), explicit_dir
 
     if collection_name:
         collections = load_collections()
         if collection_name in collections:
+            _require_dir(collections[collection_name], collection_name)
             return Path(collections[collection_name]), collection_name
         raise ValueError(f"unknown collection: {collection_name}")
 
     env_dir = os.environ.get("FOLK_DIR")
     if env_dir:
+        _require_dir(env_dir, os.path.basename(env_dir))
         return Path(env_dir), os.path.basename(env_dir)
 
     state = load_state()
@@ -87,6 +130,7 @@ def resolve_collection_dir(collection_name=None, explicit_dir=None):
     if active:
         collections = load_collections()
         if active in collections:
+            _require_dir(collections[active], active)
             return Path(collections[active]), active
 
     raise ValueError("no collection configured -- run 'folk context <name>' or set FOLK_DIR")

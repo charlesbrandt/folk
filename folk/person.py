@@ -59,14 +59,16 @@ def _person_files(collection_dir):
 
     Directory structure: {collection}/{initial}/{slug}/{slug}.md
 
-    A missing collection_dir yields nothing rather than raising -- the same
-    tolerance graph.build_person_index already gives a misconfigured or
-    not-yet-mounted collection, so a command that iterates every configured
-    collection (agenda.upcoming, list_persons callers) doesn't hard-crash
-    because one entry in ~/.config/folk/collections points somewhere that
-    doesn't currently exist.
+    A missing collection_dir yields nothing and warns on stderr (once per
+    path): this is the tolerant iterate-all path, so one registered collection
+    that is absent on this machine doesn't break every command that sweeps all
+    collections (agenda.upcoming, rebuild, graph). A collection the caller
+    explicitly requested never reaches here missing -- config.resolve_collection_dir
+    raises CollectionMissing first (docs/design/collection-registry-integrity.md,
+    Decision 2).
     """
     if not collection_dir.is_dir():
+        config.warn_missing_collection(collection_dir)
         return
     for entry in sorted(collection_dir.iterdir()):
         if not entry.is_dir():

@@ -28,6 +28,7 @@ def build_person_index():
     for _name, coll_dir in config.load_collections().items():
         coll_path = Path(coll_dir)
         if not coll_path.is_dir():
+            config.warn_missing_collection(coll_path)
             continue
         for slug, fpath in _person_files(coll_path):
             index[slug] = _read_heading(fpath)
