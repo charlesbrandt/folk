@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Appearance — folk concepts</title>
+<link rel="stylesheet" href="folk.css">
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <span class="nav-title">folk</span>
+    <a href="index.html">Overview</a>
+    <a href="three-records.html">Three records</a>
+    <a href="trust.html">Trust tiers</a>
+    <a href="journal.html">The journal</a>
+    <a href="promotion.html">Promotion &amp; review</a>
+    <a href="domains.html">Domains &amp; loci</a>
+    <a href="appearance.html" aria-current="page">Appearance</a>
+    <a href="import-and-curation.html">Import &amp; curation</a>
+    <a href="views-and-web.html">Views &amp; web UI</a>
+    <a href="phases.html">Phases &amp; roadmap</a>
+  </div>
+</header>
+
+<main class="wrap">
+
+<h1>Appearance: a durable brief for a figure</h1>
+<p class="lede">A person or Locus can carry a physical description that a consumer can address field by field. folk stores the description and returns it; it never generates, measures, or compares an image. Consistent text is not consistent likeness, and the page is written around that limit.</p>
+
+<p><strong>Status.</strong> The <code>## Appearance</code> section and the <code>## Appearance: &lt;name&gt;</code> checkpoints are implemented in <code>folk/person.py</code> and <code>folk/render.py</code>, with tests in <code>tests/test_appearance.py</code>. Reference images are a <strong>draft and not implemented</strong>: nothing in folk reads a reference, and <code>folk render</code> emits no reference key. The reference-image design and its open questions are listed at the end of this page.</p>
+
+<h2>What the section is, and what it is not</h2>
+<p>A person file gets an optional <code>## Appearance</code> section of <code>- label: value</code> lines. It is Bedrock: a human writes it, and nothing mechanical writes it in batch. Folk does not validate the label names. The conventional labels (build, hair, face, dress) are guidance for writers and consumers, not a schema, and no label name appears anywhere in folk's code. A line that does not match the <code>- label: value</code> pattern is kept as free text rather than dropped, so a paragraph written under the heading still reaches consumers.</p>
+
+<p>The section answers one question: <em>is this true of the figure whenever you meet them?</em> Build, face, hair, and a characteristic dress that is part of the identity belong here. What is true only in one piece or one shot does not: a pose, an expression, what the figure is holding, the wardrobe for one scene, and any rendering-only negative hints. The test is whether the value changes between two frames of the same piece, and the label does not decide it.</p>
+
+<div class="invariant">
+  <div class="tag">Honest limit</div>
+  <p>Text is not likeness. Handing the same brief to an image model in twelve prompts produces twelve related-looking strangers. Face-level consistency comes from a reference image, a trained embedding, or a fixed seed, all of which live on the rendering side. What the brief buys is one place where the description is written once, addressed by field, and inherited by every consumer, so drift comes from the model and not from several writers describing the same person differently.</p>
+</div>
+
+<h2>Checkpoints: states that are all true at once</h2>
+<p>A figure is sometimes defined in more than one state that stays true permanently, such as a younger and an older presentation, or a formal and a working look. Those are not history. Nothing becomes wrong when the next state is reached, so editing the file would erase a fact that still holds. A checkpoint section, <code>## Appearance: &lt;name&gt;</code>, holds one such state. The name is an opaque string. Folk does not sort names, compare them, or read a date from them.</p>
+
+<p>The merge is fixed and ordered. The base section comes first in file order. A label the checkpoint also states overrides the base value and keeps the base's position. A new label in the checkpoint is appended in the checkpoint's own order. Nothing is sorted, and the result is the same on every run.</p>
+
+<figure class="diagram" id="fig-appearance-merge">
+<svg viewBox="0 0 960 372" role="img" aria-label="A base appearance section with three labels, a checkpoint section that overrides one label and adds one, and the merged result that keeps the base's position for the overridden label and appends the new one">
+  <defs>
+    <marker id="m13" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--muted)"/>
+    </marker>
+    <marker id="m13h" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--human)"/>
+    </marker>
+    <marker id="m13s" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--stated)"/>
+    </marker>
+  </defs>
+
+  <!-- column titles -->
+  <text class="d-tb" x="40" y="28">base  ## Appearance</text>
+  <text class="d-ts" x="40" y="44">true at every checkpoint</text>
+  <text class="d-tb" x="350" y="28">checkpoint  ## Appearance: winter</text>
+  <text class="d-ts" x="350" y="44">true in this state only</text>
+  <text class="d-tb" x="680" y="28">merged view for --checkpoint winter</text>
+  <text class="d-ts" x="680" y="44">base order kept, overrides in place</text>
+
+  <!-- base column -->
+  <rect class="d-box" x="40" y="60" width="270" height="44" rx="8"/>
+  <text class="d-tm" x="54" y="87">build: tall, narrow frame</text>
+  <rect class="d-box" x="40" y="120" width="270" height="44" rx="8"/>
+  <text class="d-tm" x="54" y="147">hair: dark, past the collar</text>
+  <rect class="d-ghost" x="40" y="180" width="270" height="44" rx="8"/>
+  <text class="d-tm" x="54" y="207">dress: plain shirts  (replaced)</text>
+
+  <!-- checkpoint column -->
+  <rect class="d-box d-stated" x="350" y="180" width="270" height="44" rx="8"/>
+  <text class="d-tm" x="364" y="207">dress: heavy wool coat</text>
+  <rect class="d-box d-stated" x="350" y="240" width="270" height="44" rx="8" stroke-dasharray="6 4"/>
+  <text class="d-tm" x="364" y="267">scarf: grey, always on</text>
+  <text class="d-ts" x="350" y="306">overrides dress; adds scarf</text>
+
+  <!-- merged column -->
+  <rect class="d-box" x="680" y="60" width="260" height="44" rx="8"/>
+  <text class="d-tm" x="694" y="87">build: tall, narrow frame</text>
+  <text class="d-ts" x="694" y="100">base, position 1</text>
+  <rect class="d-box" x="680" y="120" width="260" height="44" rx="8"/>
+  <text class="d-tm" x="694" y="147">hair: dark, past the collar</text>
+  <text class="d-ts" x="694" y="160">base, position 2</text>
+  <rect class="d-box d-human" x="680" y="180" width="260" height="44" rx="8"/>
+  <text class="d-tm" x="694" y="207">dress: heavy wool coat</text>
+  <text class="d-ts" x="694" y="220">checkpoint, base position 3</text>
+  <rect class="d-box d-stated" x="680" y="240" width="260" height="44" rx="8" stroke-dasharray="6 4"/>
+  <text class="d-tm" x="694" y="267">scarf: grey, always on</text>
+  <text class="d-ts" x="694" y="280">checkpoint, appended</text>
+
+  <!-- arrows -->
+  <line class="d-arrow" x1="310" y1="82" x2="676" y2="82" marker-end="url(#m13)"/>
+  <line class="d-arrow" x1="310" y1="142" x2="676" y2="142" marker-end="url(#m13)"/>
+  <line class="d-arrow-strong" x1="620" y1="202" x2="676" y2="202" marker-end="url(#m13h)"/>
+  <line class="d-arrow" x1="620" y1="262" x2="676" y2="262" marker-end="url(#m13s)"/>
+
+  <!-- notes -->
+  <rect class="d-ghost" x="40" y="318" width="900" height="44" rx="10"/>
+  <text class="d-t" x="56" y="338"><tspan class="d-tb">no --checkpoint:</tspan> the base alone, never an implicit merge of every state. <tspan class="d-tb">unknown name:</tspan> exit 1, names the person, lists the names that exist.</text>
+  <text class="d-t" x="56" y="354"><tspan class="d-tb">fingerprint:</tspan> the first 12 hex characters of a SHA-256 over the merged text, so each state fingerprints separately.</text>
+</svg>
+<figcaption><strong>Base, checkpoint, merged.</strong> The merge is a pure function of the file. A label keeps the position the base gave it, a new label goes to the end, and no state is ever combined with another unless someone asks for it by name.</figcaption>
+</figure>
+
+<h2>The render surface</h2>
+<p>Two formats carry the brief. Both accept <code>--checkpoint</code>, and both are deterministic: two runs on unchanged input give identical output.</p>
+<pre><code>folk render person:sam --format dream --json                  # base section only
+folk render person:sam --format dream --checkpoint winter --json  # base, overridden by the winter state
+folk render person:sam --format soul --checkpoint winter       # persona view, same merge</code></pre>
+<ul>
+  <li><strong><code>folk render &lt;ref&gt; --format soul</code></strong> places an Appearance block after Voice in the generated persona view. An empty section is omitted and no empty heading is written.</li>
+  <li><strong><code>folk render &lt;ref&gt; --format dream --json</code></strong> adds keys after <code>description</code>, in this order: <code>appearance</code> (labelled pairs), <code>appearance_text</code> (the same content flattened to one line), <code>appearance_fingerprint</code>, <code>checkpoint</code> (the selected name, or an empty string), and <code>checkpoints</code> (every available name, always present, so a consumer can list them in one call).</li>
+  <li><strong><code>folk show</code></strong> lists the checkpoint names but not their contents. The summary stays a summary, and a checkpoint is shown only when it is asked for by name.</li>
+</ul>
+
+<p>The fingerprint is what makes a render attributable. A rendering consumer that records which brief it used can record the fingerprint, and a later reader can tell which version of the brief produced which image without reconstructing the text. An empty brief gives an empty fingerprint, so an undescribed figure is not confused with a described one.</p>
+
+<h2>Reference images: draft, not implemented</h2>
+<p>The reference-image design is a separate draft. It proposes a typed <code>## Reference</code> section that stores a pointer to an image and never the image itself, a per-collection descriptor that decides whether a likeness may be emitted to a renderer, and a choice of where the bytes live. Its decision about where the bytes live is a human decision and is still open. Nothing in this section is in the code today. Until that draft is confirmed, a figure's likeness is described in words only, and that is all folk will hand a renderer.</p>
+
+<h2>What is not designed</h2>
+<ul>
+  <li><strong>Interpolation and age progression.</strong> Folk does not generate a state between two checkpoints or beyond the last one. A generated text brief would arrive as a proposal for a human to accept, and a generated image would be a render, not a folk fact.</li>
+  <li><strong>Scoring images.</strong> Folk never opens an image file. The evaluation script, <code>scripts/appearance_eval.py</code>, checks only deterministic properties of the text (determinism, coverage, propagation, stability) and imports nothing that reads an image. Whether a render looks like its figure is left to a human.</li>
+  <li><strong>Appearance history.</strong> There is no timeline and no validity window on any trait. A checkpoint is a named state, not a date, and a trait that has really changed is edited in the file while git keeps the earlier text.</li>
+</ul>
+
+<nav class="pagenav">
+  <a href="domains.html">← Domains &amp; loci</a>
+  <a href="import-and-curation.html">Import &amp; curation →</a>
+</nav>
+
+</main>
+
+<footer>
+  <div class="footer-inner">
+    Concept documentation for the <strong>folk</strong> project · sources: <code>docs/design/appearance.md</code>, <code>docs/design/appearance-checkpoints.md</code>, <code>docs/design/reference-images.md</code>, <code>folk/person.py</code>, <code>folk/render.py</code> · diagrams tracked in <code>docs/site/DIAGRAMS.md</code>
+  </div>
+</footer>
+
+</body>
+</html>

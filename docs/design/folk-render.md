@@ -1,6 +1,6 @@
 # `folk render` — SOUL.md and other generated persona views (Phase 1)
 
-**Status:** confirmed by the maintainer 2026-07-21, with one condition attached to Decision 3 (see below). In `docs/HANDOFF.md`'s task sequence as task 6. None of the five decisions touch a CLAUDE.md invariant or the frozen journal schema.
+**Status:** confirmed by the maintainer 2026-07-21, with one condition attached to Decision 3 (see below). None of the five decisions touch a CLAUDE.md invariant or the frozen journal schema.
 **Context:** the wider persona-agent architecture design (Layer 1, "SOUL.md as a generated view"; Layer 3's Core Traits/Speaking Style mapping; Phase 1's exit criterion); `docs/design/loci.md` (explicitly defers genius-loci rendering to this spec's machinery — "shouldn't be designed twice"); `docs/design/collections-and-graph.md` ("characters may carry media associations... that `folk render` later inherits into SOUL.md"); `folk/person.py` (current section-parsing conventions this spec extends); `folk/journal.py` (`person_profile`, referenced in Decision 3 but not used by v1)
 
 ## Why

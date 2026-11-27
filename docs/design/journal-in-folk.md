@@ -1,6 +1,6 @@
 # Journal, replay, and lint in folk proper
 
-**Status:** implemented 2026-07-19 (`folk/journal.py`; see `docs/HANDOFF.md`'s task 2 section for the landed interfaces and two lint-level adaptations made during the port — no schema changes)
+**Status:** implemented 2026-07-19 (`folk/journal.py`; two lint-level adaptations were made during the port — no schema changes)
 **Context:** the wider persona-agent architecture design ("The journal (working design)"); prototype at `prototypes/journal-promotion/` (its README and COMPARISON.md are required reading — the prototype is the reference behavior)
 
 ## Why

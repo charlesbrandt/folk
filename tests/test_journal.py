@@ -1,7 +1,7 @@
 """Tests for folk/journal.py against the journal-in-folk.md exit criteria.
 
 Reuses the real prototype scenario fixtures at prototypes/journal-promotion/
-as the regression corpus (per docs/HANDOFF.md) rather than re-authoring new
+as the regression corpus (per the maintainer's private handoff log) rather than re-authoring new
 fixtures: the observation/promotion segments, the person-file fixture, and
 the LLM first-pass output that contains the known-bad speaker-attribution
 event (COMPARISON.md finding 1). Prototype events predate the id/v fields

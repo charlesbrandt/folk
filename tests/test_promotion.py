@@ -2,7 +2,7 @@
 
 Uses a synthetic Hermes session file (the real prototype's raw transcript
 isn't checked into the repo -- only its derived journal/llm outputs are,
-per docs/HANDOFF.md) built the shape extract_observations.py expects: one
+per the maintainer's private handoff log) built the shape extract_observations.py expects: one
 {role, content, timestamp} object per line. msg indices are the file's own
 raw line numbers -- folk/sources/hermes.py and journal.build_transcript_texts
 already agree on this numbering (see test_journal.py's TestBuildTranscriptTexts).

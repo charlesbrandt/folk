@@ -1,6 +1,6 @@
 # folk — instructions for implementing agents
 
-folk is a UNIX-philosophy CLI for remembering people, and Layer 0 of a wider persona-agent architecture. Implementation work is specified in `docs/design/` — start from the spec for your task, not from the architecture doc. **Implementing agents start at `docs/HANDOFF.md`** — it holds the task sequence, per-task escalation guidance, and the definition of done.
+folk is a UNIX-philosophy CLI for remembering people, and Layer 0 of a wider persona-agent architecture. Implementation work is specified in `docs/design/` — start from the spec for your task, not from the architecture doc. Each spec's `**Status:**` line says whether it is implemented, and `git log` is the record of what has landed. The maintainer's private handoff log (task sequence, escalation notes, definition of done) is not part of this repo; work from the specs and git history instead.
 
 ## Invariants — violating any of these is a design regression, not a style choice
 
@@ -19,7 +19,7 @@ folk is a UNIX-philosophy CLI for remembering people, and Layer 0 of a wider per
 
 ## Build order for the current specs
 
-Dependency order differs from the roadmap's priority order. Build:
+Dependency order differs from the roadmap's priority order. All four items below are implemented (see each spec's Status line); the list records the dependency order they were built in:
 
 1. `docs/design/collections-and-graph.md` — independent, can go first or in parallel with anything.
 2. `docs/design/journal-in-folk.md` — lands the journal, lint, rebuild, `id` field, per-writer segments.
@@ -34,4 +34,4 @@ The reference implementation for 2–4 is `prototypes/journal-promotion/` — it
 - Markdown: no hard line wraps — write paragraphs as single lines.
 - Commits: plain messages, no `Co-Authored-By` lines.
 - When a spec says "confirm with the maintainer," that is a stop-and-ask, not a pick-a-default.
-- No real person names in code, scripts, tests, or docs — including internal ones like `docs/HANDOFF.md` that otherwise stay concrete about real infra (IPs, hostnames, tool names are fine there). A name is someone else's personal data riding along in a file that gets committed and may go public; describe the role instead (e.g. "an external adapter script" or "a collection member"), not who it belongs to. Found and fixed once already: an external adapter script had been named after the real person whose collection it indexed, and that name had leaked into `scripts/migrate_legacy_index_triples.py`'s example usage and `docs/HANDOFF.md`'s migration note — see the `folk` skill's Public-Facing Documentation Conventions section for the fuller writeup. This is separate from invariant 7 (collection names) — it's about individual names specifically, repo-wide, not just `docs/site/`.
+- No real person names in code, scripts, tests, or docs — including the maintainer's private handoff log (not in this repo), which otherwise stays concrete about real infra (IPs, hostnames, tool names are fine there). A name is someone else's personal data riding along in a file that gets committed and may go public; describe the role instead (e.g. "an external adapter script" or "a collection member"), not who it belongs to. Found and fixed once already: an external adapter script had been named after the real person whose collection it indexed, and that name had leaked into `scripts/migrate_legacy_index_triples.py`'s example usage and a migration note in the private handoff log — see the `folk` skill's Public-Facing Documentation Conventions section for the fuller writeup. This is separate from invariant 7 (collection names) — it's about individual names specifically, repo-wide, not just `docs/site/`.

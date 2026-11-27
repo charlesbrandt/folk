@@ -1,6 +1,6 @@
 # Review queue — `folk review`
 
-**Status:** spec, ready to implement (roadmap item 1 by priority; depends on `journal-in-folk.md`, which lands the event `id`, journal locations, and review-event replay this needs — that dependency landed 2026-07-19, see `docs/HANDOFF.md`'s task 2 section for the `journal.py` interfaces to build on, including `journal.person_profile`'s existing "unresolved bedrock candidate" logic this item's queue view can extend)
+**Status:** implemented (`folk/review.py` and `folk review`; covered by `tests/test_review.py`). Was roadmap item 1 by priority; depends on `journal-in-folk.md`, which lands the event `id`, journal locations, and review-event replay this needs — that dependency landed 2026-07-19, the `journal.py` interfaces it builds on include `journal.person_profile`'s existing "unresolved bedrock candidate" logic this item's queue view can extend)
 **Context:** the wider persona-agent architecture design ("The journal" + Known issue #5); prototype at `prototypes/journal-promotion/`
 
 ## Why

@@ -1,6 +1,6 @@
 # Collection registry integrity
 
-**Status:** spec. Decision 2 (splitting the collection scanner's fail-open) is the immediately actionable piece; Decision 1 is a convention to apply on the next collection placement; Decision 3 rides on the `COLLECTION.json` file introduced by `collection-curation.md`, and needs no new file format of its own.
+**Status:** spec. Decision 2 is not implemented (checked 2026-11-25: `person._person_files` still yields nothing for a missing directory, and `folk -d <missing-path> list` prints "no people" and exits 0). Decision 2 (splitting the collection scanner's fail-open) is the immediately actionable piece; Decision 1 is a convention to apply on the next collection placement; Decision 3 rides on the `COLLECTION.json` file introduced by `collection-curation.md`, and needs no new file format of its own.
 **Context:** `CLAUDE.md` invariant 7 (collections are config, never code); `docs/design/collections-and-graph.md` (how collections get registered); `docs/design/collection-curation.md` (the `COLLECTION.json` file this doc reuses); `folk/config.py`, `folk/person.py`
 
 ## Why

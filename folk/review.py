@@ -30,7 +30,7 @@ Accept side effects (review-queue.md "Accept side-effects by item type"):
   entity  -> vocab.json aliases gains slug -> dup_of.
   bedrock -> a line is appended to the relevant person-file section, shown
              as a diff and confirmed interactively first (typist, not
-             author -- HANDOFF.md task 3 guidance).
+             author -- the maintainer's private handoff log, task 3 guidance).
 Reject (any type) writes a review event only, per the spec -- no vocab.json
 or person-file change; replay() drops the event's triples via the same
 resolved_refs lookup. For functional_classification specifically, a reject

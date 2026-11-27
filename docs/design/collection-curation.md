@@ -1,6 +1,6 @@
 # Collection curation — who may *create* a person file
 
-**Status:** implemented 2026-08-31 (recovered from a session interrupted by a quota limit on 2026-08-30, then finished — see `docs/HANDOFF.md`-equivalent note in the commit that lands this).
+**Status:** implemented 2026-08-31 ; its first caller, `folk/bulk.py`'s `import_batch()`, landed later (commit c1b691a).
 **Context:** `CLAUDE.md` invariant 5 (this doc is the "Mechanism" it points to); `skills/folk/SKILL.md`'s "Fiction Character Maps" section (the 2026-08-30 decision this doc formalizes: *"Whether a machine may mint a folk entity is the target collection's call,"* superseding the 2026-08-09 "no machine may create folk entities" rule); `docs/design/collection-registry-integrity.md` Decision 3 (reuses the same `COLLECTION.json` file for an unrelated purpose — a collection-existence check — and needs no new file format of its own); `folk/config.py`, `folk/person.py`, `tests/test_collection_curation.py`.
 
 ## Why
@@ -36,6 +36,6 @@ No collection name is enumerated in either function (invariant 7) — `tests/tes
 
 ## Not done here
 
-- **No collection currently ships a `COLLECTION.json`.** `skills/folk/SKILL.md`'s "Fiction Character Maps" section describes `characters` as agent-curated in prose; actually placing `{"curation": "agent"}` at that collection's root is a one-line, no-code follow-up for whoever wires up the first real extraction pipeline against it — not done as part of this pass, so the claim in the skill doc is aspirational until that file exists.
-- **No caller invokes `create_person_file_as_agent` yet.** `folk/sources/directory_scrape.py` still documents minting as a human/file-authoring step out of its own scope (correct, and unchanged by this doc) — a future bulk-import or extraction adapter is what would actually call this function.
+- **No collection ships a `COLLECTION.json` in this repo.** Placing `{"curation": "agent"}` at a collection's root (for example `characters`) is a one-line, no-code step for whoever wires up the first real extraction pipeline against it. Until that file exists in a given collection, that collection is `human`-curated.
+- **One caller exists:** `folk/bulk.py`'s `import_batch` mints person files through `create_person_file_as_agent` when its target collection declares `curation: "agent"` (commit `c1b691a`). `folk/sources/directory_scrape.py` itself still leaves minting to its caller.
 - **`collection-registry-integrity.md` Decision 3** (the same `COLLECTION.json` file doubling as a collection-existence marker) is a separate, still-unimplemented spec that happens to reuse this file format. Nothing here blocks it, and nothing here implements it.

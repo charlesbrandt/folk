@@ -34,7 +34,7 @@ The command is read-only, absolutely: no journal events, no person-file edits, n
 
 - **Hermes session-start assembly** (the Phase 2 consumer): a deploy-side step runs `folk surface --json` with the session's locus/participants and folds the result into the assembled prompt, exactly as explicit as piping `folk render` output — folk never assumes the Hermes filesystem.
 - **`folk render`** — resolving Decision 3's condition from `folk-render.md`, revisited now as Phase 2 design begins per its checkpoint: render stays Bedrock-only by default, permanently. A bounded Core-tier slice becomes available *only* behind an explicit opt-in flag (`--with-core N`), implemented as nothing more than a `folk surface` query with `N` as the budget and the person as the focus set, appended in its own clearly-marked section. Render grows no ranking logic of its own; if surfacing isn't built, the flag doesn't exist. Not part of this spec's v1 — it lands as a small follow-on once both commands are stable.
-- **`folk focus`** (attention ranking over Scenes/Loci — momentum, gravity, recurrence) — still deferred, per `loci.md`: it shares this scoring engine but ranks containers rather than triples, and it has nothing to rank until real Loci and locus-tagged sessions exist. Build it as a thin second caller of this engine when they do.
+- **`folk focus`** (attention ranking over Scenes/Loci — momentum, gravity, recurrence) — deferred when this spec was written, per `loci.md`; **landed since** as `folk focus` (`folk/surface.py` `focus()`, `cli.cmd_focus`): it shares this scoring engine but ranks containers rather than triples, and it has nothing to rank until real Loci and locus-tagged sessions exist. Build it as a thin second caller of this engine when they do.
 
 **Precondition worth naming for the whole phase:** every locus-shaped behavior here needs at least one real Locus file and a locus-declaring source adapter (declared, never inferred — `loci.md`'s rule). Creating the first Locus and wiring the Hermes adapter's `locus` declaration is a small human-involved setup step that should happen early in Phase 2, or this ships as dormant as task 5 did.
 
@@ -44,7 +44,7 @@ The command is read-only, absolutely: no journal events, no person-file edits, n
 - `reinforce_count` in index records (specced with `superseded_by` in `decay-and-supersession.md`; whichever task lands first adds both).
 - A planted-fixture test corpus: a shared entity spanning two loci that must surface; a disconnected fixture that must surface nothing.
 
-**Deferred, deliberately:** embeddings or any model-derived ranker; mid-conversation invocation and its latency budget; `folk focus`; render's `--with-core`; auto-linking in any form; GUI presentation (Phase 4 visualizes this query's output — glow and heat come later, the ranked list is the substance now).
+**Deferred, deliberately:** embeddings or any model-derived ranker; mid-conversation invocation and its latency budget; `folk focus` (landed since, see above); render's `--with-core`; auto-linking in any form; GUI presentation (Phase 4 visualizes this query's output — glow and heat come later, the ranked list is the substance now).
 
 ## Exit criteria
 

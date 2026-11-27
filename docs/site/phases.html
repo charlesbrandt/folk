@@ -17,6 +17,9 @@
     <a href="journal.html">The journal</a>
     <a href="promotion.html">Promotion &amp; review</a>
     <a href="domains.html">Domains &amp; loci</a>
+    <a href="appearance.html">Appearance</a>
+    <a href="import-and-curation.html">Import &amp; curation</a>
+    <a href="views-and-web.html">Views &amp; web UI</a>
     <a href="phases.html" aria-current="page">Phases &amp; roadmap</a>
   </div>
 </header>
@@ -24,10 +27,10 @@
 <main class="wrap">
 
 <h1>Where folk is, and where it's going</h1>
-<p class="lede">folk is built in phases. The foundation and Phase 1 have shipped; Phase 2 — the Archivist — is specced and pending review. Later phases exist as direction, deliberately undesigned until their prerequisites are real.</p>
+<p class="lede">folk is built in phases. The foundation, Phase 1, and Phase 2 — the Archivist — are implemented and tested. Phase 4 is partly built as an optional web dashboard; Phase 3 and the rest of Phase 4 remain direction, deliberately undesigned until their prerequisites are real.</p>
 
 <figure class="diagram" id="fig-phase-timeline">
-<svg viewBox="0 0 960 310" role="img" aria-label="Timeline of phases: Phase 0 foundation tasks 1 to 4 done, Phase 1 tasks 5 and 6 done, Phase 2 Archivist tasks 7 to 9 specced, Phases 3 and 4 future">
+<svg viewBox="0 0 960 310" role="img" aria-label="Timeline of phases: Phase 0 foundation tasks 1 to 4 done, Phase 1 tasks 5 and 6 done, Phase 2 Archivist tasks 7 to 9 done, Phase 4 web dashboard partly built, Phase 3 undesigned">
   <!-- phase 0 -->
   <text class="d-tb" x="30" y="46">Phase 0 — foundation</text>
   <text class="d-ts" x="30" y="64">done 2026-07</text>
@@ -50,31 +53,31 @@
 
   <!-- phase 2 -->
   <text class="d-tb" x="510" y="46">Phase 2 — the Archivist</text>
-  <text class="d-ts" x="510" y="64">specced, pending review</text>
-  <rect class="d-box d-stated" x="510" y="78" width="205" height="36" rx="7" stroke-dasharray="6 4"/>
-  <text class="d-ts" x="522" y="101">7 · promotion eval harness</text>
-  <rect class="d-box d-stated" x="510" y="124" width="205" height="36" rx="7" stroke-dasharray="6 4"/>
-  <text class="d-ts" x="522" y="147">8 · decay + supersession</text>
-  <rect class="d-box d-stated" x="510" y="170" width="205" height="36" rx="7" stroke-dasharray="6 4"/>
-  <text class="d-ts" x="522" y="193">9 · folk surface</text>
+  <text class="d-ts" x="510" y="64">implemented, tested</text>
+  <rect class="d-box d-obs" x="510" y="78" width="205" height="36" rx="7"/>
+  <text class="d-ts" x="522" y="101">7 · promotion eval harness ✓</text>
+  <rect class="d-box d-obs" x="510" y="124" width="205" height="36" rx="7"/>
+  <text class="d-ts" x="522" y="147">8 · decay + supersession ✓</text>
+  <rect class="d-box d-obs" x="510" y="170" width="205" height="36" rx="7"/>
+  <text class="d-ts" x="522" y="193">9 · folk surface ✓</text>
 
   <!-- future -->
-  <text class="d-tb" x="750" y="46">Later — direction only</text>
-  <text class="d-ts" x="750" y="64">undesigned on purpose</text>
+  <text class="d-tb" x="750" y="46">Phases 3 and 4</text>
+  <text class="d-ts" x="750" y="64">partly built, then undesigned</text>
   <rect class="d-ghost" x="750" y="78" width="180" height="36" rx="7"/>
   <text class="d-ts" x="762" y="101">Phase 3 · Cast</text>
-  <rect class="d-ghost" x="750" y="124" width="180" height="36" rx="7"/>
-  <text class="d-ts" x="762" y="147">Phase 4 · GUI, views</text>
+  <rect class="d-box d-stated" x="750" y="124" width="180" height="36" rx="7" stroke-dasharray="6 4"/>
+  <text class="d-ts" x="762" y="147">4 · web UI (partial)</text>
 
   <text class="d-ts" x="30" y="292">legend:</text>
   <rect class="d-box d-obs" x="90" y="278" width="18" height="18" rx="4"/>
   <text class="d-ts" x="114" y="292">shipped</text>
   <rect class="d-box d-stated" x="180" y="278" width="18" height="18" rx="4" stroke-dasharray="4 3"/>
-  <text class="d-ts" x="204" y="292">spec drafted</text>
+  <text class="d-ts" x="204" y="292">partly built</text>
   <rect class="d-ghost" x="300" y="278" width="18" height="18" rx="4"/>
   <text class="d-ts" x="324" y="292">future</text>
 </svg>
-<figcaption><strong>Nine tasks across three phases.</strong> Build order follows dependencies, not priority: the journal (task 2) is the load-bearing task everything after it sits on. Loci shipped dormant — deployed and tested, waiting for the first real Locus file to exist.</figcaption>
+<figcaption><strong>Tasks 1–9 shipped across Phases 0–2.</strong> Build order follows dependencies, not priority: the journal (task 2) is the load-bearing task everything after it sits on. Phase 4 is partly built as the optional web dashboard; Phase 3 is undesigned. Loci shipped dormant — deployed and tested; the Map and Timeline views are only as full as the locus-tagged history that flows into them.</figcaption>
 </figure>
 
 <h2>Phase 1 shipped: <code>folk render</code></h2>
@@ -186,11 +189,14 @@
 
 <p>And the posture holds to the end: <strong>surface proposes; nothing links, nothing writes.</strong> The command is read-only — no journal events, no auto-linking. A surfaced connection that deserves durability travels the existing paths: the human curates it, or conversation re-mentions it and promotion proposes it. Which also means surfacing adds no memory-poisoning surface of its own: it can only re-rank what already passed the journal's containment.</p>
 
-<h2>Deliberately not designed yet</h2>
+<h2>Read views: focus and agenda</h2>
+<p><code>folk focus</code> ranks <strong>people and Loci</strong> rather than facts, through the same RRF engine as <code>folk surface</code>: it answers what is worth attending to, not what to remember. <code>folk agenda</code> lists the next dated events (birthdays, anniversaries) from each person file's <code>## Dates</code> section, soonest first, within a look-ahead window. Both are read-only, and both are deterministic given an injected <code>--now</code>: no model call, no writes.</p>
+
+<h2>Not built yet</h2>
 <ul>
-  <li><strong>Phase 3 — Cast:</strong> multiple agent identities backed by folk.</li>
-  <li><strong>Phase 4 — GUI:</strong> the visual views (Timeline, Corkboard, Map, Studio). The ranked lists exist first; glow and heat come later.</li>
-  <li><strong>Embeddings, prose synthesis, mid-conversation surfacing, <code>folk focus</code>, <code>--with-core</code>:</strong> each named, each parked, each with a written condition for when to revisit. Restraint is a feature here — every deferred item is a place the system stayed testable.</li>
+  <li><strong>Phase 3 — Cast:</strong> multiple agent identities backed by folk. Undesigned.</li>
+  <li><strong>Phase 4 — GUI:</strong> partly built. The optional <code>web/</code> dashboard (FastAPI and Svelte, with its own dependencies outside the stdlib-only core) has the collection browser, tiered person pages, ego-graph, Locus map and timeline, a Home panel with focus and agenda, and a write side for person-file edits and the review queue. Corkboard and Studio are not built, and the design doc (<code>docs/design/web-ui.md</code>) is still a draft.</li>
+  <li><strong>Embeddings, prose synthesis, mid-conversation surfacing, <code>--with-core</code>:</strong> each named, each parked, each with a written condition for when to revisit. Restraint is a feature here — every deferred item is a place the system stayed testable.</li>
 </ul>
 
 <nav class="pagenav">
@@ -202,7 +208,7 @@
 
 <footer>
   <div class="footer-inner">
-    Concept documentation for the <strong>folk</strong> project · sources: <code>docs/HANDOFF.md</code>, <code>docs/design/promotion-eval.md</code>, <code>docs/design/decay-and-supersession.md</code>, <code>docs/design/folk-surface.md</code>, <code>docs/design/folk-render.md</code> · diagrams tracked in <code>docs/site/DIAGRAMS.md</code>
+    Concept documentation for the <strong>folk</strong> project · sources: <code>docs/design/journal-in-folk.md</code>, <code>docs/design/web-ui.md</code>, <code>docs/design/promotion-eval.md</code>, <code>docs/design/decay-and-supersession.md</code>, <code>docs/design/folk-surface.md</code>, <code>docs/design/folk-render.md</code> · diagrams tracked in <code>docs/site/DIAGRAMS.md</code>
   </div>
 </footer>
 

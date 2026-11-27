@@ -1,6 +1,6 @@
-This corpus item stands in for the synthetic 5-message "grandmother" conversation from the 2026-07-19 live Ollama test described in `docs/HANDOFF.md`'s task-4 section (the one whose pre-fix run produced a `stated` fact about `person:grandmother` sourced from a message spoken by a third party, which lint correctly quarantined, and whose post-fix run -- after `folk/promotion.py`'s prompt fix, commit `5c64b0e` -- came back clean).
+This corpus item stands in for the synthetic 5-message "grandmother" conversation from the 2026-07-19 live Ollama test described in the maintainer's private handoff log's task-4 section (the one whose pre-fix run produced a `stated` fact about `person:grandmother` sourced from a message spoken by a third party, which lint correctly quarantined, and whose post-fix run -- after `folk/promotion.py`'s prompt fix, commit `5c64b0e` -- came back clean).
 
-**This is not that session.** The actual transcript and both model outputs from 2026-07-19 were never written to disk anywhere -- only the paragraph in `docs/HANDOFF.md` survives, and this environment has no network path to the original promotion host to regenerate them live. Confirmed (2026-07-22) authoring a fresh, clearly-synthetic fixture that exercises the same bug class instead of reconstructing history from prose.
+**This is not that session.** The actual transcript and both model outputs from 2026-07-19 were never written to disk anywhere -- only the paragraph in the maintainer's private handoff log survives, and this environment has no network path to the original promotion host to regenerate them live. Confirmed (2026-07-22) authoring a fresh, clearly-synthetic fixture that exercises the same bug class instead of reconstructing history from prose.
 
 ## The scenario
 

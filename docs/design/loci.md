@@ -1,6 +1,6 @@
 # `loci` — Locus collections, scoping, and cross-domain guests
 
-**Status:** confirmed by the maintainer 2026-07-20. In `docs/HANDOFF.md`'s task sequence as task 5. Nothing here touches a CLAUDE.md invariant or the frozen journal schema.
+**Status:** confirmed by the maintainer 2026-07-20. Nothing here touches a CLAUDE.md invariant or the frozen journal schema.
 **Context:** the wider persona-agent architecture design (Layer 4, "Locus ↔ folk mapping" — "a dedicated entity but not a dedicated type"; the five views, the Archivist's cross-Scene surfacing); `docs/design/journal-schema.md` (the `locus` field — reserved since v1, unused until this spec); `docs/design/collections-and-graph.md` (precedent for domain collections, config-only); `docs/design/journal-in-folk.md` (precedent this spec generalizes: registered per-domain roots, two registration mechanisms)
 
 ## Why
@@ -61,7 +61,7 @@ New in `folk/config.py`: `load_loci_roots()`, a near-literal copy of `load_journ
 - No new collection-name enumeration anywhere in code (invariant 7) — registering a new Locus, either mechanism, requires zero code changes.
 
 **Deferred to follow-on specs, deliberately:**
-- `folk focus` (attention scoring) — needs loci to exist first as its query scope; a natural first consumer of the currently-unconsumed `last_reinforced` field.
+- `folk focus` (attention scoring) — needs loci to exist first as its query scope; a natural first consumer of the currently-unconsumed `last_reinforced` field. **Landed since:** `folk focus` exists (`folk/surface.py` `focus()`, `cli.cmd_focus`).
 - `guest_of` review-queue proposal automation.
 - `folk render`'s genius-loci prompt assembly (Phase 1) — same prompt-assembly machinery as SOUL.md generation; shouldn't be designed twice.
 - Timeline, Corkboard, Studio views.

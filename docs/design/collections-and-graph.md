@@ -1,6 +1,6 @@
 # `characters` + `authors` collections, and `folk graph`
 
-**Status:** spec, ready to implement (roadmap item 2 — the Phase 0 remainder). Supersedes `fictional-collection-and-graph.md` (2026-07-19, after discussion with the maintainer and the digger community-layer decisions).
+**Status:** implemented (collection registry in `folk/config.py`, graph in `folk/graph.py`; covered by `tests/test_config.py` and `tests/test_graph.py`). Was roadmap item 2, the Phase 0 remainder. Supersedes `fictional-collection-and-graph.md` (2026-07-19, after discussion with the maintainer and the digger community-layer decisions).
 **Context:** the wider persona-agent architecture design (Layer 0 gap, Phase 0); `~/repos/digger/docs/design/community-layer.md` ("Decisions (2026-07-19)" — domain collections, identity minting); `folk/config.py`
 
 ## Why

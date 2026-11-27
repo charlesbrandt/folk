@@ -1,6 +1,6 @@
 # Session-end promotion job
 
-**Status:** spec, ready to implement (roadmap item 4) — depends on `journal-in-folk.md` (schema, lint, per-writer segments) being landed, or at minimum its event schema being frozen
+**Status:** implemented (`folk/promotion.py` and `folk promote`; covered by `tests/test_promotion.py`). Only the Hermes session adapter is registered; the OpenWebUI adapter described below is not built. Was roadmap item 4 — depends on `journal-in-folk.md` (schema, lint, per-writer segments) being landed, or at minimum its event schema being frozen
 **Context:** the wider persona-agent architecture design (Layer 2 flow); prototype pipeline in `prototypes/journal-promotion/` (`extract_observations.py`, `promote_llm.py`, `lint.py`)
 
 ## Why

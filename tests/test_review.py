@@ -1,7 +1,7 @@
 """Tests for folk/review.py against review-queue.md's exit criteria.
 
 Reuses prototypes/journal-promotion/ fixtures via test_journal.py's helpers
-(per docs/HANDOFF.md: the prototype is the regression corpus), the same way
+(per the maintainer's private handoff log: the prototype is the regression corpus), the same way
 test_journal.py does. Two of the three exit-criteria items -- the radio workshop
 bedrock candidate and the known false-stated event -- come straight from
 those fixtures. The third (a coined predicate / a near-duplicate entity

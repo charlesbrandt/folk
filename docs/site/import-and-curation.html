@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Import &amp; curation — folk concepts</title>
+<link rel="stylesheet" href="folk.css">
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <span class="nav-title">folk</span>
+    <a href="index.html">Overview</a>
+    <a href="three-records.html">Three records</a>
+    <a href="trust.html">Trust tiers</a>
+    <a href="journal.html">The journal</a>
+    <a href="promotion.html">Promotion &amp; review</a>
+    <a href="domains.html">Domains &amp; loci</a>
+    <a href="appearance.html">Appearance</a>
+    <a href="import-and-curation.html" aria-current="page">Import &amp; curation</a>
+    <a href="views-and-web.html">Views &amp; web UI</a>
+    <a href="phases.html">Phases &amp; roadmap</a>
+  </div>
+</header>
+
+<main class="wrap">
+
+<h1>Who may create a person, and what a bulk import does</h1>
+<p class="lede">Person files are the human-curated tier, so folk has to decide who may bring a new one into existence. By default only a human does. A collection can state on disk that an automated process may create files in it. A bulk import is the first automated writer, and it is built to fail one row at a time rather than the whole batch.</p>
+
+<p><strong>Status, at a glance.</strong> Implemented: the per-collection curation gate, the batch import runner with skip-and-report, and person-file minting gated by that curation. Implemented as a skeleton: the directory adapter's parsing, with no live fetch. Open: identity resolution beyond the current heuristic, which is a design with no code behind it yet.</p>
+
+<h2>Curation: human by default, agent by declaration</h2>
+<p>A collection may place a <code>COLLECTION.json</code> file in its own root. Only the exact value <code>"agent"</code> opts in:</p>
+<pre><code>{"curation": "agent"}</code></pre>
+<p>Anything else resolves to <code>human</code>: a missing file, unreadable or malformed JSON, a non-object document, or any other value. Folk fails closed, so a typo in the file leaves the collection protected. The file is read in one place, and nothing in the code names a collection.</p>
+
+<p>The gate covers creation by a machine and nothing else. A human may create or edit any file in any collection, whatever the file says. Once a human edits an agent-created file, it belongs to that human, and by convention automated writers stop rewriting it. Folk does not enforce that convention in code. A machine caller creates a file only through one function, which checks the slug, checks the gate, and refuses to overwrite an existing file. The refusal is an error the caller sees, not a quiet skip.</p>
+
+<figure class="diagram" id="fig-curation-gate">
+<svg viewBox="0 0 960 330" role="img" aria-label="A collection descriptor file resolves to agent or human once; an automated caller passes a gate that writes a new person file only when the collection is agent-curated, and is refused otherwise; a human edit takes no gate at all">
+  <defs>
+    <marker id="m14" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--muted)"/>
+    </marker>
+    <marker id="m14d" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--danger)"/>
+    </marker>
+    <marker id="m14h" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--human)"/>
+    </marker>
+  </defs>
+
+  <!-- descriptor -->
+  <rect class="d-box" x="30" y="50" width="270" height="110" rx="10"/>
+  <text class="d-tb" x="46" y="76">COLLECTION.json</text>
+  <text class="d-tm" x="46" y="100">{"curation": "agent"}</text>
+  <text class="d-ts" x="46" y="120">only that exact value opts in</text>
+  <text class="d-ts" x="46" y="138">absent, malformed, or any other</text>
+  <text class="d-ts" x="46" y="154">value resolves to human</text>
+
+  <!-- machine caller -->
+  <rect class="d-box" x="30" y="200" width="270" height="56" rx="10"/>
+  <text class="d-tb" x="46" y="224">automated caller</text>
+  <text class="d-ts" x="46" y="243">a mechanical importer, never a person</text>
+
+  <!-- gate -->
+  <rect class="d-box d-jrnl" x="370" y="120" width="250" height="90" rx="10"/>
+  <text class="d-tb" x="386" y="146">create_person_file_as_agent</text>
+  <text class="d-ts" x="386" y="166">1 · slug must match the file alphabet</text>
+  <text class="d-ts" x="386" y="182">2 · collection must resolve to agent</text>
+  <text class="d-ts" x="386" y="198">3 · the file must not already exist</text>
+
+  <!-- outcomes -->
+  <rect class="d-box d-obs" x="700" y="60" width="230" height="70" rx="10"/>
+  <text class="d-tb" x="716" y="86">person file written</text>
+  <text class="d-ts" x="716" y="106">new file only, under its initial</text>
+  <text class="d-ts" x="716" y="120">directory</text>
+
+  <rect class="d-box d-danger" x="700" y="180" width="230" height="70" rx="10"/>
+  <text class="d-tb" x="716" y="206">CurationRefused</text>
+  <text class="d-ts" x="716" y="226">collection is human-curated;</text>
+  <text class="d-ts" x="716" y="242">nothing is written</text>
+
+  <!-- human edit, no gate -->
+  <rect class="d-ghost" x="370" y="270" width="560" height="40" rx="8" style="stroke: var(--human)"/>
+  <text class="d-t" x="386" y="295"><tspan class="d-tb t-human">a human</tspan> may create or edit any file in any collection; no code path checks the descriptor on an edit</text>
+
+  <!-- arrows -->
+  <path class="d-arrow" d="M300,105 C335,105 340,150 368,160" marker-end="url(#m14)"/>
+  <text class="d-tm" x="300" y="94">resolved once</text>
+  <line class="d-arrow-strong" x1="300" y1="228" x2="368" y2="190" marker-end="url(#m14)"/>
+  <line class="d-arrow" x1="620" y1="150" x2="696" y2="100" marker-end="url(#m14h)"/>
+  <text class="d-tm t-obs" x="630" y="112">agent</text>
+  <line class="d-arrow-danger" x1="620" y1="190" x2="696" y2="215" marker-end="url(#m14d)"/>
+  <text class="d-tm t-danger" x="628" y="236">human</text>
+</svg>
+<figcaption><strong>One gate for machines, none for people.</strong> The descriptor is read once, into one of two values. The gate is the only path a machine has to a new person file, and it writes only when the collection has opted in. A human's edit never meets the gate, which is the point: the gate protects people from machine-authored files, not from their own edits.</figcaption>
+</figure>
+
+<p>The shipped repository includes no collection descriptor, so every collection in it resolves to human. Opting a collection in is a one-line file that its owner places on purpose.</p>
+
+<h2>Bulk import: one row fails alone</h2>
+<p>A bulk import is a batch of already-shaped observation events, produced by an adapter from a source that has no conversation and no model step. Each event goes through the same lint as any other write, and <code>import_batch</code> wraps that lint in a loop that keeps going after a failure. A bad row is reported with its reason, and its neighbors are still appended. This is a different policy from promotion, which quarantines a whole session because one model-written event may signal that the rest are suspect. Rows from a scrape share no author and no reasoning, so one bad row says nothing about the others.</p>
+
+<figure class="diagram" id="fig-batch-skip">
+<svg viewBox="0 0 960 270" role="img" aria-label="Three rows enter a per-event lint; a clean row is appended and may mint a person file, a malformed row is skipped and reported with its reason, and one index rebuild runs after the whole batch">
+  <defs>
+    <marker id="m15" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--muted)"/>
+    </marker>
+    <marker id="m15d" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--danger)"/>
+    </marker>
+  </defs>
+
+  <!-- rows -->
+  <rect class="d-box" x="30" y="50" width="220" height="44" rx="8"/>
+  <text class="d-tm" x="44" y="77">row 1 · clean record</text>
+  <rect class="d-box" x="30" y="110" width="220" height="44" rx="8"/>
+  <text class="d-tm" x="44" y="137">row 2 · malformed slug</text>
+  <rect class="d-box" x="30" y="170" width="220" height="44" rx="8"/>
+  <text class="d-tm" x="44" y="197">row 3 · clean record</text>
+
+  <!-- lint -->
+  <rect class="d-box d-jrnl" x="330" y="60" width="200" height="140" rx="10"/>
+  <text class="d-tb" x="346" y="88">lint, per event</text>
+  <text class="d-ts" x="346" y="108">the same check as every write</text>
+  <text class="d-ts" x="346" y="124">nothing is loosened here</text>
+
+  <!-- outcomes -->
+  <rect class="d-box d-obs" x="620" y="50" width="310" height="60" rx="10"/>
+  <text class="d-tb" x="636" y="74">appended</text>
+  <text class="d-ts" x="636" y="94">then a person file is minted, if the</text>
+  <text class="d-ts" x="636" y="108">collection is agent-curated and the name is known</text>
+
+  <rect class="d-box d-danger" x="620" y="130" width="310" height="60" rx="10"/>
+  <text class="d-tb" x="636" y="154">skipped and reported</text>
+  <text class="d-ts" x="636" y="174">the outcome carries the lint reason;</text>
+  <text class="d-ts" x="636" y="188">the batch continues</text>
+
+  <!-- rebuild -->
+  <rect class="d-box d-idx" x="620" y="206" width="310" height="44" rx="10"/>
+  <text class="d-tm" x="636" y="233">folk index --rebuild, once, after the batch</text>
+
+  <!-- arrows -->
+  <line class="d-arrow" x1="250" y1="72" x2="326" y2="100"/>
+  <line class="d-arrow-danger" x1="250" y1="132" x2="326" y2="140" marker-end="url(#m15d)"/>
+  <line class="d-arrow" x1="250" y1="192" x2="326" y2="160"/>
+  <line class="d-arrow" x1="530" y1="110" x2="616" y2="80" marker-end="url(#m15)"/>
+  <line class="d-arrow-danger" x1="530" y1="160" x2="616" y2="160" marker-end="url(#m15d)"/>
+  <line class="d-arrow-dash" x1="775" y1="110" x2="775" y2="202" marker-end="url(#m15)"/>
+</svg>
+<figcaption><strong>Skip, report, rebuild once.</strong> Lint still hard-fails on every malformed event and still runs before every append. What changed is the batch around it: a bad row costs only itself, and the index is rebuilt once at the end rather than once per row.</figcaption>
+</figure>
+
+<p>Three details matter for anyone running a batch. Person-file minting happens only for an event that appended, only for a subject the caller gave a display name for, and at most once per subject in a batch. Minting is best-effort: a refused, invalid, or already-existing file leaves the event appended. The batch function does not run the rebuild, so the operator runs it as a separate step.</p>
+
+<p>Organizational structure is modeled as Loci rather than bare strings. A directory record that places a person in a department produces a <code>works_at</code> edge whose object is <code>locus:&lt;department&gt;</code>, so the department gets a file, can be shown, and can carry its own cast. The shape of that file is a <code>## Locus Type</code> section: a single free-text value that folk parses and never validates, so a department, a lab, or a shared resource are labels a writer chooses. The import does not create department files. A writer does that by hand, once per organization. This classifier is implemented and tested, but its design has not yet been confirmed by the maintainer.</p>
+
+<h2>The directory adapter, honestly</h2>
+<p>The directory adapter in <code>folk/sources/directory_scrape.py</code> is a skeleton. Its <code>parse()</code> turns one raw record into observation events, one for a title and one for a department, and it is tested. Its <code>fetch()</code> is a stub that raises <code>NotImplementedError</code>, because a real fetch needs an HTTP client and an HTML or JSON parser that folk does not depend on. The adapter is deliberately absent from the transcript-source registry, because that registry feeds the model-based promotion path and a bulk import uses none of that.</p>
+
+<h2>Identity resolution: open, and not yet built</h2>
+<p>Deciding whether a scraped name is someone folk already knows is harder than appending rows. Today it rests on one heuristic. <code>folk lookup</code> compares token sets of the two slugs and returns the single best candidate at or above a 0.6 Jaccard overlap. The design document that replaces it is a living draft with no code behind it: there is no identity module, no alias section, and no identifier section yet.</p>
+
+<p>The draft lists several defects in the heuristic. The near-duplicate check in lint runs only on the object of an event, which the code confirms, so a new person who appears as a subject is never flagged. The type prefix, such as <code>person</code>, counts as a shared token in every comparison, which inflates every score. A shared generic token, such as a title, can produce a match on its own. Two people whose slugs differ only by a suffix are proposed again on every run, because nothing records that they are different.</p>
+
+<p>The draft's direction is to stop scoring and start recording. A human answer would be stored in the person file as an alternate name or a stable external identifier, so the next lookup is an exact match and the same question is never asked twice. Candidate generation would be a set of named, deterministic matchers, ordered by configuration, and no combined score would be produced. Machines would never merge two files, and an ambiguous case would stay ambiguous until a human decides it. Open questions for the maintainer include whether the alternate-name and identifier data are one section or two, whether declining a duplicate proposal should leave the facts it came with in place (the draft says the current behavior does not), and whether a re-scrape of a known person may update that person's file.</p>
+
+<h2>The scope boundary</h2>
+<p>folk owns identity and relationships that stay true whichever project is looking at them. A project owns everything specific to itself, and it refers to folk's <code>person:</code> and <code>locus:</code> slugs rather than copying its own content into folk. This is the same line that appearance draws within a single person: what is true of the figure across every frame belongs to folk, and what is true in one frame belongs to the project.</p>
+
+<ul>
+  <li><strong>folk's:</strong> who a person is, their durable facts, their organizations and their curated connections.</li>
+  <li><strong>a project's:</strong> its notes, its protocols and results, its tasks and deadlines, and any record that has to show a fact existed unaltered at a given time. folk's redaction mechanism is built to remove a fact on request, which is close to the opposite guarantee.</li>
+  <li><strong>the seam:</strong> a project writes its own edges back into folk as observation events and keeps everything else in its own record. A Locus description can drift toward project narrative, and that is a known failure mode rather than a current violation.</li>
+</ul>
+
+<nav class="pagenav">
+  <a href="appearance.html">← Appearance</a>
+  <a href="views-and-web.html">Views &amp; web UI →</a>
+</nav>
+
+</main>
+
+<footer>
+  <div class="footer-inner">
+    Concept documentation for the <strong>folk</strong> project · sources: <code>docs/design/collection-curation.md</code>, <code>docs/design/bulk-import.md</code>, <code>docs/design/locus-type.md</code>, <code>docs/design/identity-resolution.md</code>, <code>docs/design/collection-registry-integrity.md</code>, <code>docs/design/scope-boundary.md</code>, <code>folk/bulk.py</code>, <code>folk/config.py</code>, <code>folk/sources/directory_scrape.py</code> · diagrams tracked in <code>docs/site/DIAGRAMS.md</code>
+  </div>
+</footer>
+
+</body>
+</html>

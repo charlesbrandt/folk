@@ -219,6 +219,7 @@ Tasks 1–6 (foundation + Phase 1) are implemented and tested: collections+graph
 | `prototypes/journal-promotion/` | Reference implementation for the journal/promotion pipeline — read its `README.md`/`COMPARISON.md` before touching journal code; its quirks were each earned by a real failure |
 | `docs/design/locus-type.md` | `## Locus Type` classifier spec |
 | `docs/design/bulk-import.md` | Bulk/mechanical import spec (skip-and-report, rebuild-once, orgs-as-Loci) |
+| `docs/design/immich-source.md` | Immich source adapter and deterministic narrative renderer (proposed and implemented 2026-11-25, not yet confirmed) |
 | `docs/design/identity-resolution.md` | Living design doc for entity-resolution beyond slug-token overlap — open, not yet implemented |
 | `docs/design/unicode-slugs.md` | Decided and implemented (2026-08-31): Unicode-aware journal slugs, `folk/slug.py` extraction, the deferred `## Associations` multi-name segmentation gap |
 

@@ -1,6 +1,6 @@
 # `## Appearance: <checkpoint>` — concurrently-valid appearance states
 
-**Status:** draft 2026-08-17; both open questions confirmed by the maintainer 2026-08-18 (see "Open questions for a human"); implemented 2026-08-21 (`docs/HANDOFF.md` task 12). Reopens `appearance.md` Decision 7 ("no appearance history") and scopes it rather than overturning it.
+**Status:** draft 2026-08-17; both open questions confirmed by the maintainer 2026-08-18 (see "Open questions for a human"); implemented 2026-08-21. Reopens `appearance.md` Decision 7 ("no appearance history") and scopes it rather than overturning it.
 **Context:** `docs/design/appearance.md` (Decisions 1–4 and 7 in particular — this is an extension of that section, not a new one); `docs/design/reference-images.md` (the companion spec — a reference image is *of* a checkpoint, so the two land together or the second lands alone and useless); `docs/design/folk-render.md` (Decision 4, `--format dream`, the consumer surface); `docs/design/decay-and-supersession.md` (why Bedrock facts do not decay, which is the rule this spec must not quietly break); the `folk` skill's "Fiction Character Maps" section (the chapter-gated companion pattern, which turns out to share this spec's axis exactly).
 
 ## Why

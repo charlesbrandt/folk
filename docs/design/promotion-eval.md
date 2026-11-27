@@ -1,7 +1,7 @@
 # Promotion evaluation harness — TRUSTMEM triad (Phase 2)
 
 **Status:** confirmed by the maintainer 2026-07-22 — full text reviewed and holds. No invariant or schema change anywhere in this spec.
-**Context:** the wider persona-agent architecture design (Known issue #3's resolution: TRUSTMEM's transition-verification triad, arXiv:2606.25161, adopted 2026-07-19 as promotion's measurable criterion — never built); `docs/design/session-promotion-job.md` (the system under test); `prototypes/journal-promotion/` (the fixture corpus and the original ad-hoc "6/8 reference facts" count this replaces); `docs/HANDOFF.md` escalation item 3 (prompt-quality judgment is stronger-model work — this harness is the *detector* that tells you when to escalate, never the thing that iterates the prompt itself).
+**Context:** the wider persona-agent architecture design (Known issue #3's resolution: TRUSTMEM's transition-verification triad, arXiv:2606.25161, adopted 2026-07-19 as promotion's measurable criterion — never built); `docs/design/session-promotion-job.md` (the system under test); `prototypes/journal-promotion/` (the fixture corpus and the original ad-hoc "6/8 reference facts" count this replaces); the maintainer's private handoff log escalation item 3 (prompt-quality judgment is stronger-model work — this harness is the *detector* that tells you when to escalate, never the thing that iterates the prompt itself).
 
 ## Why
 

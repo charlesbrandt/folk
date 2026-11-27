@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Views &amp; web UI — folk concepts</title>
+<link rel="stylesheet" href="folk.css">
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <span class="nav-title">folk</span>
+    <a href="index.html">Overview</a>
+    <a href="three-records.html">Three records</a>
+    <a href="trust.html">Trust tiers</a>
+    <a href="journal.html">The journal</a>
+    <a href="promotion.html">Promotion &amp; review</a>
+    <a href="domains.html">Domains &amp; loci</a>
+    <a href="appearance.html">Appearance</a>
+    <a href="import-and-curation.html">Import &amp; curation</a>
+    <a href="views-and-web.html" aria-current="page">Views &amp; web UI</a>
+    <a href="phases.html">Phases &amp; roadmap</a>
+  </div>
+</header>
+
+<main class="wrap">
+
+<h1>Reading the records, and the optional dashboard</h1>
+<p class="lede">folk's views are commands that read the three records and print a result. None of them calls a model, and none of them writes. The optional web dashboard is a second front end over the same library. It adds a small number of write paths, each going through a path folk already uses, and it lives in its own directory that can be deleted without touching the command line.</p>
+
+<h2>The read-only view family</h2>
+<p>Five commands read the records and nothing else. Each one is deterministic when it is given a fixed time, and none of them imports a model client.</p>
+
+<ul>
+  <li><strong><code>folk show &lt;name&gt;</code></strong> prints one person or Locus: tags, archetype, voice, appearance, checkpoint names, associations, and defining moments, read from the person file. It is a summary, so checkpoint contents need <code>folk render</code>.</li>
+  <li><strong><code>folk graph</code></strong> emits a Mermaid diagram over the derived index. <code>--person</code> draws an ego graph (depth 2 by default), <code>--locus</code> draws a Locus's cast, and <code>--context</code> filters by tag. If the graph would exceed the node limit, it prints a warning on stderr and no diagram, so the output stays readable.</li>
+  <li><strong><code>folk surface</code></strong> answers "given this Locus or these people, what facts from outside this context bear on them?" It ranks triples with four orders (tier, recency, recurrence, and how connected the far entity is), fuses them with reciprocal rank fusion, and returns at most <code>--budget</code> items, 12 by default. Superseded records and candidate-tier records never qualify. Stale records drop to the bottom rather than out of the list. Each item carries a one-line reason that names the shared entity.</li>
+  <li><strong><code>folk focus</code></strong> applies the same fusion to containers, which are people and Loci, not triples. It answers "which containers are worth attention right now?" It can be scoped by <code>--locus</code>, by <code>--person</code>, or by <code>--collection</code>.</li>
+  <li><strong><code>folk agenda</code></strong> lists the next occurrence of each date in every person file's <code>## Dates</code> section, soonest first, within a window of <code>--within</code> days (30 by default). A recurring month-and-day is rolled forward against the current date. The result for a date already passed this year is next year's, and a February 29 in a non-leap year is treated as March 1.</li>
+</ul>
+
+<p>Two properties hold across the family. <code>surface</code> and <code>agenda</code> read the wall clock when <code>--now</code> is omitted, because staleness and the date window depend on it, so a reproducible run passes <code>--now</code> and then gives byte-identical output. <code>focus</code> does not read the clock. Where a command offers <code>--json</code> (<code>surface</code>, <code>focus</code>, <code>agenda</code>), that form is the machine-readable output for prompt assembly or a dashboard. A consumer that wants a briefing reads the ranked list. It does not get a second ranking of its own.</p>
+
+<figure class="diagram" id="fig-read-write-lanes">
+<svg viewBox="0 0 960 380" role="img" aria-label="Three records feed read-only CLI views and web read endpoints, which print or serve results; two web write endpoints send changes through a journal review event or a one-file git commit, each followed by an index rebuild">
+  <defs>
+    <marker id="m16" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--muted)"/>
+    </marker>
+    <marker id="m16d" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--danger)"/>
+    </marker>
+  </defs>
+
+  <!-- lane labels -->
+  <text class="d-tb" x="30" y="24">records</text>
+  <text class="d-tb" x="330" y="24">read paths: no writes</text>
+  <text class="d-tb" x="690" y="24">results or write targets</text>
+
+  <!-- records -->
+  <rect class="d-box d-human" x="30" y="40" width="220" height="52" rx="8"/>
+  <text class="d-tb" x="44" y="62">person files</text>
+  <text class="d-ts" x="44" y="80">curated, in git</text>
+  <rect class="d-box d-jrnl" x="30" y="122" width="220" height="52" rx="8"/>
+  <text class="d-tb" x="44" y="144">journal</text>
+  <text class="d-ts" x="44" y="162">append-only events</text>
+  <rect class="d-box d-idx" x="30" y="204" width="220" height="52" rx="8" stroke-dasharray="6 4"/>
+  <text class="d-tb" x="44" y="226">index</text>
+  <text class="d-ts" x="44" y="244">derived, rebuild-only</text>
+
+  <!-- CLI read views -->
+  <rect class="d-box" x="330" y="40" width="260" height="92" rx="8"/>
+  <text class="d-tb" x="346" y="64">CLI views</text>
+  <text class="d-tm" x="346" y="84">show · graph · surface</text>
+  <text class="d-tm" x="346" y="102">focus · agenda</text>
+  <text class="d-ts" x="346" y="120">no model call, no writes</text>
+
+  <!-- web read endpoints -->
+  <rect class="d-box" x="330" y="150" width="260" height="92" rx="8"/>
+  <text class="d-tb" x="346" y="174">web read endpoints</text>
+  <text class="d-tm" x="346" y="194">people · loci · graph</text>
+  <text class="d-tm" x="346" y="212">agenda · focus · review queue</text>
+  <text class="d-ts" x="346" y="230">served as JSON to the front end</text>
+
+  <!-- web write endpoints -->
+  <rect class="d-box d-danger" x="330" y="262" width="260" height="92" rx="8"/>
+  <text class="d-tb" x="346" y="286">web write endpoints</text>
+  <text class="d-tm" x="346" y="306">POST /review/action</text>
+  <text class="d-tm" x="346" y="324">POST /people/…/edit/commit</text>
+  <text class="d-ts" x="346" y="344">the preview endpoint writes nothing</text>
+
+  <!-- outputs -->
+  <rect class="d-box" x="690" y="40" width="240" height="92" rx="8"/>
+  <text class="d-tb" x="706" y="64">stdout or --json</text>
+  <text class="d-ts" x="706" y="84">text for a reader, or a</text>
+  <text class="d-ts" x="706" y="100">ranked list for prompt</text>
+  <text class="d-ts" x="706" y="116">assembly</text>
+
+  <rect class="d-box d-jrnl" x="690" y="262" width="240" height="40" rx="8"/>
+  <text class="d-tm" x="706" y="287">journal review event</text>
+  <rect class="d-box d-human" x="690" y="312" width="240" height="40" rx="8"/>
+  <text class="d-tm" x="706" y="337">git commit of one file</text>
+
+  <!-- arrows: reads -->
+  <line class="d-arrow" x1="250" y1="66" x2="326" y2="80" marker-end="url(#m16)"/>
+  <line class="d-arrow" x1="250" y1="148" x2="326" y2="96" marker-end="url(#m16)"/>
+  <line class="d-arrow" x1="250" y1="230" x2="326" y2="190" marker-end="url(#m16)"/>
+  <line class="d-arrow" x1="590" y1="86" x2="686" y2="86" marker-end="url(#m16)"/>
+
+  <!-- arrows: web writes -->
+  <line class="d-arrow-danger" x1="330" y1="300" x2="686" y2="282" marker-end="url(#m16d)"/>
+  <line class="d-arrow-danger" x1="330" y1="320" x2="686" y2="332" marker-end="url(#m16d)"/>
+
+  <!-- rebuild note -->
+  <rect class="d-ghost" x="30" y="290" width="260" height="66" rx="8" style="stroke: var(--index)"/>
+  <text class="d-ts" x="44" y="312">every write is followed by</text>
+  <text class="d-tm" x="44" y="332">folk index --rebuild</text>
+  <text class="d-ts" x="44" y="348">the only writer of the index</text>
+</svg>
+<figcaption><strong>Two lanes, and the lanes do not cross.</strong> The read lane reaches the records and returns results without writing anything. The write lane has exactly two entry points, and each one lands in a record folk already owns: a review decision becomes a journal event, and a person-file edit becomes a commit of that one file. The index is rebuilt after either.</figcaption>
+</figure>
+
+<h2>The web dashboard</h2>
+<p>The dashboard lives in <code>web/</code>. It has its own requirements file, and it imports folk as a library rather than calling the command line. The folk package itself has no dependency on it, so deleting <code>web/</code> leaves every command in the table above working. It is local-first and single-user. It is a write surface, so it is not meant to be exposed to other people.</p>
+
+<p>Its read endpoints serve the same data as the commands above: the collection list, the people grid, a tiered person profile, ego and Locus graphs, the Locus list, a Locus profile, a Locus timeline, the agenda, and the focus ranking. The Home view shows agenda and focus panels. A Locus page has a Map view, drawn from the cast graph, and a Timeline view, drawn from its dated events.</p>
+
+<p>Its write endpoints are two. The review endpoint accepts or rejects one queue item at a time, because the request shape takes a single item and never a list, so a batch accept is not possible. The edit endpoint writes a person-file section, limited to an allowlist that includes the appearance section. A preview call shows the diff first, and the commit call re-derives that diff on the server rather than trusting the client's copy. The commit stages only the one file it changed, runs as one git commit, and then rebuilds the index.</p>
+
+<p>Two things are deferred on purpose. The Corkboard view is planned for a later version, and the Studio view is set aside, possibly for good. Several things are out of scope for this version: push notifications, which belong to the agent layer that reads <code>folk agenda --json</code>; multi-user access and any network exposure; real-time collaborative editing; any model-derived ranking; and showing a reference image, which waits on the reference-image design. The web tests need the web dependencies installed, so they cannot run in an environment that has only the core package.</p>
+
+<h2>What the views do not do</h2>
+<ul>
+  <li>No view calls a model. The ranking is the four orders and the fusion, and the reasons are mechanical.</li>
+  <li>No view writes to the index. Only <code>folk index --rebuild</code> does, and a rebuild is deterministic.</li>
+  <li>No view opens an image. folk reads no image file anywhere in its code.</li>
+</ul>
+
+<nav class="pagenav">
+  <a href="import-and-curation.html">← Import &amp; curation</a>
+  <a href="phases.html">Phases &amp; roadmap →</a>
+</nav>
+
+</main>
+
+<footer>
+  <div class="footer-inner">
+    Concept documentation for the <strong>folk</strong> project · sources: <code>docs/design/folk-surface.md</code>, <code>docs/design/web-ui.md</code>, <code>docs/design/decay-and-supersession.md</code>, <code>folk/surface.py</code>, <code>folk/agenda.py</code>, <code>folk/cli.py</code>, <code>web/routers</code> · diagrams tracked in <code>docs/site/DIAGRAMS.md</code>
+  </div>
+</footer>
+
+</body>
+</html>
